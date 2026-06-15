@@ -1,120 +1,875 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OneOfTwo</title>
+
+<meta charset="UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>OneOfTwo – Find the missing half</title>
 
 <style>
+
+* {
+
+    box-sizing: border-box;
+
+}
+
 body {
+
     margin: 0;
-    font-family: Arial;
+
+    font-family: Arial, Helvetica, sans-serif;
+
     background: #0f172a;
-    color: white;
+
+    color: #ffffff;
+
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
+
     background: #020617;
+
+    padding: 20px 40px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+}
+
+.logo {
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+}
+
+nav a {
+
+    color: #cbd5e1;
+
+    text-decoration: none;
+
+    margin-left: 25px;
+
+    font-size: 15px;
+
 }
 
 .hero {
+
+    padding: 90px 30px;
+
     text-align: center;
-    padding: 60px;
+
+    background: linear-gradient(135deg, #0f172a, #1e40af);
+
 }
 
-input, textarea {
-    padding: 10px;
-    margin: 5px;
-    width: 250px;
+.hero h1 {
+
+    font-size: 56px;
+
+    margin-bottom: 15px;
+
 }
 
-button {
-    padding: 10px 20px;
-    margin: 10px;
+.hero p {
+
+    font-size: 21px;
+
+    color: #dbeafe;
+
+    max-width: 750px;
+
+    margin: 0 auto 30px;
+
+}
+
+.search-box input {
+
+    width: 90%;
+
+    max-width: 700px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    border: none;
+
+    font-size: 18px;
+
+}
+
+.btn {
+
+    margin-top: 20px;
+
+    padding: 14px 28px;
+
+    border-radius: 12px;
+
+    border: none;
+
+    font-size: 16px;
+
     cursor: pointer;
+
+    font-weight: bold;
+
+}
+
+.primary {
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+}
+
+.secondary {
+
+    background: #2563eb;
+
+    color: white;
+
 }
 
 .section {
-    padding: 40px;
+
+    padding: 60px 40px;
+
 }
 
-.grid {
+.section h2 {
+
+    font-size: 34px;
+
+    margin-bottom: 25px;
+
+}
+
+.layout {
+
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-    gap: 20px;
+
+    grid-template-columns: 260px 1fr;
+
+    gap: 30px;
+
+}
+
+.sidebar {
+
+    background: #020617;
+
+    border: 1px solid #1e293b;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    height: fit-content;
+
+}
+
+.sidebar h3 {
+
+    margin-top: 0;
+
+}
+
+.sidebar a {
+
+    display: block;
+
+    color: #cbd5e1;
+
+    text-decoration: none;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid #1e293b;
+
+}
+
+.categories {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+
+    gap: 22px;
+
+}
+
+.category {
+
+    background: #020617;
+
+    padding: 24px;
+
+    border-radius: 18px;
+
+    border: 1px solid #1e293b;
+
+    transition: 0.2s;
+
+}
+
+.category:hover {
+
+    transform: translateY(-5px);
+
+    border-color: #3b82f6;
+
+}
+
+.category h3 {
+
+    margin-top: 0;
+
+    font-size: 21px;
+
+}
+
+.category ul {
+
+    color: #cbd5e1;
+
+    line-height: 1.8;
+
+    padding-left: 20px;
+
+}
+
+.listings {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 22px;
+
+}
+
+.listing {
+
+    background: #020617;
+
+    border: 1px solid #1e293b;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+}
+
+.badge {
+
+    display: inline-block;
+
+    background: #1d4ed8;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+
+}
+
+.how {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 22px;
+
 }
 
 .card {
+
     background: #020617;
-    padding: 20px;
-    border-radius: 10px;
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    border: 1px solid #1e293b;
+
 }
+
+.form-section {
+
+    background: #020617;
+
+    padding: 60px 30px;
+
+    text-align: center;
+
+}
+
+form input,
+
+form textarea,
+
+form select {
+
+    width: 90%;
+
+    max-width: 550px;
+
+    padding: 15px;
+
+    margin: 10px;
+
+    border-radius: 10px;
+
+    border: none;
+
+    font-size: 16px;
+
+}
+
+textarea {
+
+    min-height: 120px;
+
+}
+
+footer {
+
+    background: #020617;
+
+    color: #94a3b8;
+
+    text-align: center;
+
+    padding: 35px;
+
+}
+
+@media (max-width: 800px) {
+
+    header {
+
+        flex-direction: column;
+
+        gap: 15px;
+
+    }
+
+    nav a {
+
+        margin: 0 8px;
+
+    }
+
+    .hero h1 {
+
+        font-size: 38px;
+
+    }
+
+    .layout {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
 <header>
-    <h2>OneOfTwo</h2>
+
+    <div class="logo">OneOfTwo</div>
+
+    <nav>
+
+        <a href="#categories">Categories</a>
+
+        <a href="#listings">Listings</a>
+
+        <a href="#how">How it works</a>
+
+        <a href="#add">Add Listing</a>
+
+    </nav>
+
 </header>
 
-<div class="hero">
-    <h1>Find the missing half</h1>
-    <button onclick="showForm()">List your item</button>
-</div>
+<section class="hero">
 
-<!-- FORM -->
-<div id="formSection" style="display:none; text-align:center;">
-    <h2>Add your item</h2>
-    <input id="title" placeholder="Item name"><br>
-    <textarea id="desc" placeholder="Description"></textarea><br>
-    <button onclick="addItem()">Submit</button>
-</div>
+    <h1>Find the missing half.</h1>
 
-<!-- ITEMS -->
-<div class="section">
-    <h2>Items</h2>
-    <div id="items" class="grid"></div>
-</div>
+    <p>
 
-<script>
-function showForm() {
-    document.getElementById("formSection").style.display = "block";
-}
+        OneOfTwo is a marketplace for single items, missing parts,
 
-function addItem() {
-    let title = document.getElementById("title").value;
-    let desc = document.getElementById("desc").value;
+        incomplete sets, lost objects and things waiting to be matched again.
 
-    let item = {title, desc};
+    </p>
 
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    items.push(item);
-    localStorage.setItem("items", JSON.stringify(items));
+    <div class="search-box">
 
-    renderItems();
-}
+        <input type="text" placeholder="Search for one shoe, one earring, car part, LEGO piece, lost item..." />
 
-function renderItems() {
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    let container = document.getElementById("items");
-    container.innerHTML = "";
+    </div>
 
-    items.forEach(i => {
-        container.innerHTML += `
-            <div class="card">
-                <h3>${i.title}</h3>
-                <p>${i.desc}</p>
+    <button class="btn primary">Search items</button>
+
+    <button class="btn secondary">Add listing</button>
+
+</section>
+
+<section class="section" id="categories">
+
+    <h2>Browse categories</h2>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <h3>All categories</h3>
+
+            <a href="#fashion">Fashion & Shoes</a>
+
+            <a href="#jewellery">Jewellery & Watches</a>
+
+            <a href="#home">Home & Living</a>
+
+            <a href="#automotive">Automotive</a>
+
+            <a href="#electronics">Electronics</a>
+
+            <a href="#tools">Tools & Parts</a>
+
+            <a href="#toys">Toys & Games</a>
+
+            <a href="#collectibles">Collectibles</a>
+
+            <a href="#lost">Lost & Found</a>
+
+            <a href="#parts">Missing Parts</a>
+
+        </aside>
+
+        <div class="categories">
+
+            <div class="category" id="fashion">
+
+                <h3>👟 Fashion & Shoes</h3>
+
+                <ul>
+
+                    <li>Single shoes</li>
+
+                    <li>Gloves</li>
+
+                    <li>Socks</li>
+
+                    <li>Belts</li>
+
+                    <li>Handbag parts</li>
+
+                    <li>Clothing accessories</li>
+
+                </ul>
+
             </div>
-        `;
-    });
-}
 
-renderItems();
-</script>
+            <div class="category" id="jewellery">
+
+                <h3>💍 Jewellery & Watches</h3>
+
+                <ul>
+
+                    <li>Single earrings</li>
+
+                    <li>Watch parts</li>
+
+                    <li>Bracelet elements</li>
+
+                    <li>Necklace parts</li>
+
+                    <li>Charms</li>
+
+                    <li>Jewellery sets</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="home">
+
+                <h3>🏠 Home & Living</h3>
+
+                <ul>
+
+                    <li>Decorative items</li>
+
+                    <li>Cups and plates</li>
+
+                    <li>Lampshades</li>
+
+                    <li>Furniture parts</li>
+
+                    <li>Kitchen set pieces</li>
+
+                    <li>Home ornaments</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="automotive">
+
+                <h3>🚗 Automotive</h3>
+
+                <ul>
+
+                    <li>Car parts</li>
+
+                    <li>Mirror covers</li>
+
+                    <li>Wheel caps</li>
+
+                    <li>Interior parts</li>
+
+                    <li>Motorcycle parts</li>
+
+                    <li>Bicycle parts</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="electronics">
+
+                <h3>🎧 Electronics</h3>
+
+                <ul>
+
+                    <li>Single headphones</li>
+
+                    <li>Chargers</li>
+
+                    <li>Remote controls</li>
+
+                    <li>Cables</li>
+
+                    <li>Phone accessories</li>
+
+                    <li>Device parts</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="tools">
+
+                <h3>🛠 Tools & Hardware</h3>
+
+                <ul>
+
+                    <li>Tool parts</li>
+
+                    <li>Screws</li>
+
+                    <li>Handles</li>
+
+                    <li>Machine elements</li>
+
+                    <li>Workshop items</li>
+
+                    <li>Replacement parts</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="toys">
+
+                <h3>🧸 Toys & Games</h3>
+
+                <ul>
+
+                    <li>LEGO pieces</li>
+
+                    <li>Puzzle pieces</li>
+
+                    <li>Board game parts</li>
+
+                    <li>Figures</li>
+
+                    <li>Game accessories</li>
+
+                    <li>Missing toy parts</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="collectibles">
+
+                <h3>🎨 Collectibles & Sets</h3>
+
+                <ul>
+
+                    <li>Trading cards</li>
+
+                    <li>Coins</li>
+
+                    <li>Model parts</li>
+
+                    <li>Limited items</li>
+
+                    <li>Incomplete collections</li>
+
+                    <li>Hobby items</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="lost">
+
+                <h3>🔍 Lost & Found</h3>
+
+                <ul>
+
+                    <li>Lost items</li>
+
+                    <li>Found items</li>
+
+                    <li>Looking for owner</li>
+
+                    <li>Recovered objects</li>
+
+                    <li>Missing personal items</li>
+
+                    <li>Public place findings</li>
+
+                </ul>
+
+            </div>
+
+            <div class="category" id="parts">
+
+                <h3>🧩 Missing Parts</h3>
+
+                <ul>
+
+                    <li>Single components</li>
+
+                    <li>Set pieces</li>
+
+                    <li>Pair matching</li>
+
+                    <li>Replacement elements</li>
+
+                    <li>Incomplete objects</li>
+
+                    <li>One of two items</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="section" id="listings">
+
+    <h2>Recent listings</h2>
+
+    <div class="listings">
+
+        <div class="listing">
+
+            <span class="badge">Shoes</span>
+
+            <h3>Single left Nike shoe</h3>
+
+            <p>Looking for the matching right shoe.</p>
+
+        </div>
+
+        <div class="listing">
+
+            <span class="badge">Jewellery</span>
+
+            <h3>One silver earring</h3>
+
+            <p>Available for someone missing the second one.</p>
+
+        </div>
+
+        <div class="listing">
+
+            <span class="badge">Toys</span>
+
+            <h3>Missing LEGO piece</h3>
+
+            <p>Searching for one specific replacement brick.</p>
+
+        </div>
+
+        <div class="listing">
+
+            <span class="badge">Automotive</span>
+
+            <h3>Car wheel cover</h3>
+
+            <p>One original wheel cap available.</p>
+
+        </div>
+
+        <div class="listing">
+
+            <span class="badge">Home</span>
+
+            <h3>Half of a decorative set</h3>
+
+            <p>Looking to complete a matching pair.</p>
+
+        </div>
+
+        <div class="listing">
+
+            <span class="badge">Lost & Found</span>
+
+            <h3>Found keychain</h3>
+
+            <p>Owner can describe it and claim it.</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="section" id="how">
+
+    <h2>How OneOfTwo works</h2>
+
+    <div class="how">
+
+        <div class="card">
+
+            <h3>1. Search</h3>
+
+            <p>Find the missing part, single item or second half you need.</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>2. List</h3>
+
+            <p>Add an item you own, lost, found or want to match.</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>3. Match</h3>
+
+            <p>Buy, sell, exchange or reconnect incomplete items.</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="form-section" id="add">
+
+    <h2>Add your listing</h2>
+
+    <p>Add the item you have or describe the item you are looking for.</p>
+
+    <form>
+
+        <input type="text" placeholder="Item title" />
+
+        <br>
+
+        <select>
+
+            <option>Select category</option>
+
+            <option>Fashion & Shoes</option>
+
+            <option>Jewellery & Watches</option>
+
+            <option>Home & Living</option>
+
+            <option>Automotive</option>
+
+            <option>Electronics</option>
+
+            <option>Tools & Hardware</option>
+
+            <option>Toys & Games</option>
+
+            <option>Collectibles & Sets</option>
+
+            <option>Lost & Found</option>
+
+            <option>Missing Parts</option>
+
+        </select>
+
+        <br>
+
+        <textarea placeholder="Describe the item, missing part, condition and location"></textarea>
+
+        <br>
+
+        <input type="text" placeholder="Location / City" />
+
+        <br>
+
+        <button class="btn primary" type="button">Publish listing</button>
+
+    </form>
+
+</section>
+
+<footer>
+
+    © 2026 OneOfTwo — Find the missing half.
+
+</footer>
 
 </body>
+
 </html>
