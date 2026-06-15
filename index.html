@@ -1,19 +1,120 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneOfTwo</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background: #020617;
+}
+
+.hero {
+    text-align: center;
+    padding: 60px;
+}
+
+input, textarea {
+    padding: 10px;
+    margin: 5px;
+    width: 250px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.section {
+    padding: 40px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #020617;
+    padding: 20px;
+    border-radius: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<h1>OneOfTwo</h1>
+<header>
+    <h2>OneOfTwo</h2>
+</header>
 
-<p>Find the missing half.</p>
+<div class="hero">
+    <h1>Find the missing half</h1>
+    <button onclick="showForm()">List your item</button>
+</div>
+
+<!-- FORM -->
+<div id="formSection" style="display:none; text-align:center;">
+    <h2>Add your item</h2>
+    <input id="title" placeholder="Item name"><br>
+    <textarea id="desc" placeholder="Description"></textarea><br>
+    <button onclick="addItem()">Submit</button>
+</div>
+
+<!-- ITEMS -->
+<div class="section">
+    <h2>Items</h2>
+    <div id="items" class="grid"></div>
+</div>
+
+<script>
+function showForm() {
+    document.getElementById("formSection").style.display = "block";
+}
+
+function addItem() {
+    let title = document.getElementById("title").value;
+    let desc = document.getElementById("desc").value;
+
+    let item = {title, desc};
+
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+    items.push(item);
+    localStorage.setItem("items", JSON.stringify(items));
+
+    renderItems();
+}
+
+function renderItems() {
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+    let container = document.getElementById("items");
+    container.innerHTML = "";
+
+    items.forEach(i => {
+        container.innerHTML += `
+            <div class="card">
+                <h3>${i.title}</h3>
+                <p>${i.desc}</p>
+            </div>
+        `;
+    });
+}
+
+renderItems();
+</script>
 
 </body>
-
 </html>
