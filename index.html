@@ -8,47 +8,33 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link rel="icon" type="image/png" href="Oneoftwo .png">
-  
+<title>OneOfTwo - Find the missing half</title>
+
+<link rel="icon" type="image/png" href="Oneoftwo.png">
+
 <style>
 
 *{box-sizing:border-box}
 
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0f172a;color:white}
 
-header{background:#020617;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid #1e293b}
+header{background:#020617;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;gap:20px}
 
-.logo{
+.logo{display:flex;align-items:center;gap:12px;font-size:30px;font-weight:800}
 
-display:flex;
+.logo img{width:50px;height:50px;object-fit:contain}
 
-align-items:center;
+nav a{color:#cbd5e1;text-decoration:none;margin-left:22px;font-size:15px}
 
-gap:12px;
+nav a:hover{color:white}
 
-font-size:30px;
+.hero{padding:80px 30px;text-align:center;background:linear-gradient(135deg,#020617,#1d4ed8)}
 
-font-weight:800;
-
-}
-
-.logo img{
-
-width:50px;
-
-height:50px;
-
-object-fit:contain;
-
-}
-
-nav a{color:#cbd5e1;text-decoration:none;margin-left:24px;font-size:15px}
-
-.hero{padding:90px 30px;text-align:center;background:linear-gradient(135deg,#020617,#1d4ed8)}
+.hero img{width:90px;margin-bottom:20px}
 
 .hero h1{font-size:64px;margin:0 0 10px}
 
-.hero h2{font-size:32px;margin:0 0 20px;color:#dbeafe}
+.hero h2{font-size:32px;margin:0 0 20px}
 
 .hero p{font-size:20px;max-width:800px;margin:0 auto 30px;color:#dbeafe}
 
@@ -60,9 +46,11 @@ nav a{color:#cbd5e1;text-decoration:none;margin-left:24px;font-size:15px}
 
 .secondary{background:#2563eb;color:white}
 
-.stats{display:flex;justify-content:center;gap:20px;margin-top:35px;flex-wrap:wrap}
+.stats{display:flex;justify-content:center;gap:20px;margin-top:30px;flex-wrap:wrap}
 
 .stat{background:rgba(255,255,255,.12);padding:16px 28px;border-radius:16px;border:1px solid rgba(255,255,255,.2)}
+
+.stat strong{display:block;font-size:24px}
 
 .section{padding:60px 40px}
 
@@ -72,33 +60,49 @@ nav a{color:#cbd5e1;text-decoration:none;margin-left:24px;font-size:15px}
 
 .sidebar{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:25px;height:fit-content}
 
-.sidebar a{display:block;color:#cbd5e1;text-decoration:none;padding:10px 0;border-bottom:1px solid #1e293b}
+.sidebar a{display:block;color:#cbd5e1;text-decoration:none;padding:10px 0;border-bottom:1px solid #334155}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px}
 
-.card,.category,.listing{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:24px;transition:.2s}
+.card{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,.25)}
 
-.card:hover,.category:hover,.listing:hover{transform:translateY(-4px);border-color:#3b82f6}
+.card h3{margin-top:0;font-size:22px}
 
-.category h3,.listing h3{margin-top:0}
+.card li{margin:8px 0;color:#e2e8f0}
 
-.category ul{color:#cbd5e1;line-height:1.8;padding-left:20px}
+.listing{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:22px}
 
-.badge{display:inline-block;background:#1d4ed8;padding:6px 12px;border-radius:20px;font-size:12px;margin-bottom:10px}
+.badge{display:inline-block;background:#1d4ed8;padding:6px 10px;border-radius:999px;font-size:12px;margin-bottom:10px}
 
-.popular{display:flex;flex-wrap:wrap;gap:12px}
-
-.tag{background:#020617;border:1px solid #1e293b;border-radius:999px;padding:12px 18px;color:#cbd5e1}
-
-.form-section{background:#020617;padding:70px 30px;text-align:center}
-
-form input,form textarea,form select{width:90%;max-width:560px;padding:16px;margin:10px;border-radius:10px;border:none;font-size:16px}
+form input,form textarea,form select,.auth-card input{width:100%;max-width:560px;padding:16px;border-radius:12px;border:none;margin:8px 0;font-size:16px}
 
 textarea{min-height:120px}
 
+.auth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;margin-top:25px}
+
+.auth-card{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+
+.auth-card h3{font-size:28px;margin-bottom:12px}
+
+.auth-card p{color:#cbd5e1;margin-bottom:18px}
+
 footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
-@media(max-width:800px){header{flex-direction:column;gap:15px}.hero h1{font-size:42px}.hero h2{font-size:24px}.layout{grid-template-columns:1fr}nav a{margin:0 8px}}
+@media(max-width:800px){
+
+header{flex-direction:column;text-align:center}
+
+nav a{display:inline-block;margin:8px 10px}
+
+.hero h1{font-size:48px}
+
+.hero h2{font-size:26px}
+
+.layout{grid-template-columns:1fr}
+
+.section{padding:45px 22px}
+
+}
 
 </style>
 
@@ -110,11 +114,11 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
   <div class="logo">
 
-  <img src="Oneoftwo .png" alt="OneOfTwo Logo">
+    <img src="Oneoftwo.png" alt="OneOfTwo Logo">
 
-  <span>OneOfTwo</span>
+    <span>OneOfTwo</span>
 
-</div>
+  </div>
 
   <nav>
 
@@ -126,16 +130,18 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
     <a href="#add">Add Listing</a>
 
+    <a href="#login">Login</a>
+
+    <a href="#signup">Sign Up</a>
+
   </nav>
 
 </header>
 
 <section class="hero">
-<img src="Oneoftwo .png"
 
-     alt="OneOfTwo Logo"
+  <img src="Oneoftwo.png" alt="OneOfTwo Logo">
 
-     style="width:90px;margin-bottom:20px;">
   <h1>OneOfTwo</h1>
 
   <h2>Find the missing half.</h2>
@@ -144,7 +150,7 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
   <div class="search">
 
-    <input type="text" placeholder="Search for single earring, LEGO piece, one shoe, remote control, lost item..." />
+    <input type="text" placeholder="Search for single earring, LEGO piece, one shoe, remote control, lost item...">
 
   </div>
 
@@ -154,69 +160,69 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
   <div class="stats">
 
-    <div class="stat"><strong>12+</strong><br>Categories</div>
+    <div class="stat"><strong>12+</strong>Categories</div>
 
-    <div class="stat"><strong>0</strong><br>Live Listings</div>
+    <div class="stat"><strong>0</strong>Live Listings</div>
 
-    <div class="stat"><strong>0</strong><br>Matches</div>
+    <div class="stat"><strong>0</strong>Matches</div>
 
   </div>
 
 </section>
 
-<section class="section" id="categories">
+<section id="categories" class="section">
 
   <h2>What are you looking for?</h2>
 
   <div class="layout">
 
-    <aside class="sidebar">
+    <div class="sidebar">
 
       <h3>All categories</h3>
 
-      <a href="#fashion">👟 Fashion & Shoes</a>
+      <a href="#">Fashion & Shoes</a>
 
-      <a href="#jewellery">💍 Jewellery & Watches</a>
+      <a href="#">Jewellery & Watches</a>
 
-      <a href="#home">🏠 Home & Living</a>
+      <a href="#">Home & Living</a>
 
-      <a href="#automotive">🚗 Automotive</a>
+      <a href="#">Automotive</a>
 
-      <a href="#electronics">🎧 Electronics</a>
+      <a href="#">Electronics</a>
 
-      <a href="#tools">🛠 Tools & Hardware</a>
+      <a href="#">Tools & Hardware</a>
 
-      <a href="#toys">🧩 Toys & Games</a>
+      <a href="#">Toys & Games</a>
 
-      <a href="#collectibles">🎴 Collectibles</a>
+      <a href="#">Collectibles</a>
 
-      <a href="#lost">🔍 Lost & Found</a>
+      <a href="#">Lost & Found</a>
 
-      <a href="#parts">🧩 Missing Parts</a>
+      <a href="#">Missing Parts</a>
 
-    </aside>
+    </div>
 
     <div class="grid">
 
-      <div class="category" id="fashion"><h3>👟 Fashion & Shoes</h3><ul><li>Single shoes</li><li>Gloves</li><li>Socks</li><li>Belts</li><li>Handbag parts</li><li>Accessories</li></ul></div>
+      <div class="card"><h3>👟 Fashion & Shoes</h3><ul><li>Single shoes</li><li>Gloves</li><li>Socks</li><li>Belts</li><li>Handbag parts</li></ul></div>
 
-      <div class="category" id="jewellery"><h3>💍 Jewellery & Watches</h3><ul><li>Single earrings</li><li>Watch parts</li><li>Bracelet elements</li><li>Necklace parts</li><li>Charms</li><li>Jewellery sets</li></ul></div>
+      <div class="card"><h3>💍 Jewellery & Watches</h3><ul><li>Single earrings</li><li>Watch parts</li><li>Bracelet elements</li><li>Necklace parts</li><li>Charms</li></ul></div>
 
-      <div class="category" id="home"><h3>🏠 Home & Living</h3><ul><li>Decorative items</li><li>Cups and plates</li><li>Lampshades</li><li>Furniture parts</li><li>Kitchen set pieces</li><li>Home ornaments</li></ul></div>
+      <div class="card"><h3>🏠 Home & Living</h3><ul><li>Decorative items</li><li>Cups and plates</li><li>Lampshades</li><li>Furniture parts</li><li>Home ornaments</li></ul></div>
 
-      <div class="category" id="automotive"><h3>🚗 Automotive</h3><ul><li>Car parts</li><li>Mirror covers</li><li>Wheel caps</li><li>Interior parts</li><li>Motorcycle parts</li><li>Bicycle parts</li></ul></div>
+      <div class="card"><h3>🚗 Automotive</h3><ul><li>Car parts</li><li>Mirror covers</li><li>Wheel caps</li><li>Interior parts</li><li>Bicycle parts</li></ul></div>
 
-      <div class="category" id="electronics"><h3>🎧 Electronics</h3><ul><li>Single headphones</li><li>Chargers</li><li>Remote controls</li><li>Cables</li><li>Phone accessories</li><li>Device parts</li></ul></div>
+      <div class="card"><h3>🎧 Electronics</h3><ul><li>Single headphones</li><li>Chargers</li><li>Remote controls</li><li>Cables</li><li>Phone accessories</li></ul></div>
 
-      <div class="category" id="tools"><h3>🛠 Tools & Hardware</h3><ul><li>Tool parts</li><li>Screws</li><li>Handles</li><li>Machine elements</li><li>Workshop items</li><li>Replacement parts</li></ul></div>
+      <div class="card"><h3>🧰 Tools & Hardware</h3><ul><li>Tool parts</li><li>Screws</li><li>Handles</li><li>Machine elements</li><li>Replacement parts</li></ul></div>
 
-      <div class="category" id="toys"><h3>🧩 Toys & Games</h3><ul><li>LEGO pieces</li><li>Puzzle pieces</li><li>Board game parts</li><li>Figures</li><li>Game accessories</li><li>Missing toy parts</li></ul></div>
+      <div class="card"><h3>🧸 Toys & Games</h3><ul><li>LEGO pieces</li><li>Puzzle pieces</li><li>Board game parts</li><li>Figures</li><li>Game accessories</li></ul></div>
 
-      <div class="category" id="collectibles"><h3>🎴 Collectibles & Sets</h3><ul><li>Trading cards</li><li>Coins</li><li>Model parts</li><li>Limited items</li><li>Incomplete collections</li><li>Hobby items</li></ul></div>
+      <div class="card"><h3>🃏 Collectibles & Sets</h3><ul><li>Trading cards</li><li>Coins</li><li>Model parts</li><li>Limited items</li><li>Incomplete collections</li></ul></div>
 
-      <div class="category" id="lost"><h3>🔍 Lost & Found</h3><ul><li>Lost items</li><li>Found items</li><li>Looking for owner</li><li>Recovered objects</li><li>Missing personal items</li><li>Public findings</li></ul></div>
+      <div class="card"><h3>🔍 Lost & Found</h3><ul><li>Lost items</li><li>Found items</li><li>Looking for owner</li><li>Recovered objects</li><li>Public place findings</li></ul></div>
 
-      <div class="category" id="parts"><h3>🧩 Missing Parts</h3><ul><li>Single components</li><li>Set pieces</li><li>Pair matching</li><li>Replacement elements</li><li>Incomplete objects</li><li>One of two items</li></ul></div>
+      <div class="card"><h3>🧩 Missing Parts</h3><ul><li>Single components</li><li>Set pieces</li><li>Pair matching</li><li>Replacement elements</li><li>One of two items</li></ul></div>
 
     </div>
 
@@ -224,87 +230,47 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
 </section>
 
-<section class="section" id="popular">
+<section id="popular" class="section">
 
-  <h2>Popular searches</h2>
-
-  <div class="popular">
-
-    <div class="tag">single earring</div>
-
-    <div class="tag">one shoe</div>
-
-    <div class="tag">LEGO piece</div>
-
-    <div class="tag">remote control</div>
-
-    <div class="tag">missing wheel cap</div>
-
-    <div class="tag">puzzle piece</div>
-
-    <div class="tag">watch link</div>
-
-    <div class="tag">bracelet charm</div>
-
-    <div class="tag">bicycle pedal</div>
-
-    <div class="tag">single headphone</div>
-
-  </div>
-
-</section>
-
-<section class="section" id="listings">
-
-  <h2>Recently added</h2>
+  <h2>Popular Searches</h2>
 
   <div class="grid">
 
-    <div class="listing"><span class="badge">Shoes</span><h3>Single Nike shoe</h3><p>Looking for the right shoe.</p><small>Germany</small></div>
+    <div class="listing"><span class="badge">Fashion</span><h3>Single Nike shoe</h3><p>Looking for the matching left shoe.</p></div>
 
-    <div class="listing"><span class="badge">Jewellery</span><h3>Silver earring</h3><p>One piece available.</p><small>Poland</small></div>
+    <div class="listing"><span class="badge">Jewellery</span><h3>One gold earring</h3><p>Missing second earring from a pair.</p></div>
 
-    <div class="listing"><span class="badge">Toys</span><h3>LEGO piece 3794</h3><p>Replacement part needed.</p><small>Germany</small></div>
+    <div class="listing"><span class="badge">Toys</span><h3>LEGO missing piece</h3><p>Small grey connector piece needed.</p></div>
 
-    <div class="listing"><span class="badge">Automotive</span><h3>Wheel cover</h3><p>One original cap available.</p><small>Hamburg</small></div>
-
-    <div class="listing"><span class="badge">Home</span><h3>Half salt shaker set</h3><p>Looking for matching piece.</p><small>Berlin</small></div>
-
-    <div class="listing"><span class="badge">Lost & Found</span><h3>Found keychain</h3><p>Owner can describe it.</p><small>Hamburg</small></div>
-
-    <div class="listing"><span class="badge">Electronics</span><h3>Single AirPod</h3><p>Left side available.</p><small>Germany</small></div>
-
-    <div class="listing"><span class="badge">Games</span><h3>Missing chess piece</h3><p>Black knight needed.</p><small>Online</small></div>
+    <div class="listing"><span class="badge">Automotive</span><h3>Wheel cap</h3><p>Looking for one matching wheel cap.</p></div>
 
   </div>
 
 </section>
 
-<section class="section" id="how">
+<section id="listings" class="section">
 
-  <h2>How it works</h2>
+  <h2>Latest Listings</h2>
 
   <div class="grid">
 
-    <div class="card"><h3>1️⃣ Lost a part?</h3><p>Search for the missing item, part or second half.</p></div>
+    <div class="listing"><span class="badge">Wanted</span><h3>Single AirPod Pro</h3><p>Looking for right side AirPod Pro, white.</p></div>
 
-    <div class="card"><h3>2️⃣ Have a spare item?</h3><p>Create a listing in seconds and help someone complete their set.</p></div>
+    <div class="listing"><span class="badge">Available</span><h3>One black glove</h3><p>Found one black leather glove in good condition.</p></div>
 
-    <div class="card"><h3>3️⃣ Match and connect</h3><p>Buy, sell, exchange or recover incomplete things.</p></div>
+    <div class="listing"><span class="badge">Missing</span><h3>Board game card</h3><p>Need one missing card to complete the set.</p></div>
 
   </div>
 
 </section>
 
-<section class="form-section" id="add">
+<section id="add" class="section">
 
   <h2>Add your listing</h2>
 
-  <p>Add the item you have, lost, found or are looking for.</p>
-
   <form>
 
-    <input type="text" placeholder="Item title" /><br>
+    <input type="text" placeholder="Item title">
 
     <select>
 
@@ -334,11 +300,51 @@ footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
     <textarea placeholder="Describe the item, missing part, condition and location"></textarea><br>
 
-    <input type="text" placeholder="Location / City" /><br>
+    <input type="text" placeholder="Location / City"><br>
 
     <button class="btn primary" type="button">Publish listing</button>
 
   </form>
+
+</section>
+
+<section id="login" class="section">
+
+  <h2>Login or create account</h2>
+
+  <div class="auth-grid">
+
+    <div class="auth-card">
+
+      <h3>Login</h3>
+
+      <p>Access your listings, saved searches and future matches.</p>
+
+      <input type="email" placeholder="Email address">
+
+      <input type="password" placeholder="Password">
+
+      <button class="btn primary" type="button">Login</button>
+
+    </div>
+
+    <div id="signup" class="auth-card">
+
+      <h3>Sign Up</h3>
+
+      <p>Create your OneOfTwo account and start adding items.</p>
+
+      <input type="text" placeholder="Full name">
+
+      <input type="email" placeholder="Email address">
+
+      <input type="password" placeholder="Create password">
+
+      <button class="btn secondary" type="button">Create account</button>
+
+    </div>
+
+  </div>
 
 </section>
 
