@@ -268,11 +268,11 @@ nav a{display:inline-block;margin:8px 10px}
 
   <h2>Add your listing</h2>
 
-  <form>
+  <form id="listingForm">
 
-    <input type="text" placeholder="Item title">
+    <input id="title" type="text" placeholder="Item title">
 
-    <select>
+    <select id="category">
 
       <option>Select category</option>
 
@@ -298,11 +298,11 @@ nav a{display:inline-block;margin:8px 10px}
 
     </select><br>
 
-    <textarea placeholder="Describe the item, missing part, condition and location"></textarea><br>
+    <textarea id="description" placeholder="Describe the item, missing part, condition and location"></textarea><br>
 
-    <input type="text" placeholder="Location / City"><br>
+    <input id="location" type="text" placeholder="Location / City">
 
-    <button class="btn primary" type="button">Publish listing</button>
+    <button class="btn primary" type="submit">Publish listing</button>
 
   </form>
 
@@ -349,11 +349,24 @@ nav a{display:inline-block;margin:8px 10px}
 </section>
 
 <footer>
-
-  © 2026 OneOfTwo — Find the missing half.
-
+ © 2026 OneOfTwo — Find the missing half.
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+
+const supabaseUrl = 'https://lnbrqcklgndbizlhkdef.supabase.co';
+
+const supabaseKey = 'sb_publishable_EzhbUdb-HgoZ6hYtuvLfgQ_sY2fvRXW';
+
+const supabase = window.supabase.createClient(
+
+  supabaseUrl,
+
+  supabaseKey
+
+);
+</script>
 </body>
 
 </html>
