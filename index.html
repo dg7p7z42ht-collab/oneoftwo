@@ -320,11 +320,11 @@ nav a{display:inline-block;margin:8px 10px}
 
       <p>Access your listings, saved searches and future matches.</p>
 
-      <input type="email" placeholder="Email address">
+      <input id="loginEmail" type="email" placeholder="Email address">
 
-      <input type="password" placeholder="Password">
+      <input id="loginPassword" type="password" placeholder="Password">
 
-      <button class="btn primary" type="button">Login</button>
+      <button id="loginButton" class="btn primary" type="button">Login</button>
 
     </div>
 
@@ -334,13 +334,13 @@ nav a{display:inline-block;margin:8px 10px}
 
       <p>Create your OneOfTwo account and start adding items.</p>
 
-      <input type="text" placeholder="Full name">
+      <input id="signupName" type="text" placeholder="Full name">
 
-      <input type="email" placeholder="Email address">
+      <input id="signupEmail" type="email" placeholder="Email address">
 
-      <input type="password" placeholder="Create password">
+      <input id="signupPassword" type="password" placeholder="Create password">
 
-      <button class="btn secondary" type="button">Create account</button>
+      <button id="signupButton" class="btn secondary" type="button">Create account</button>
 
     </div>
 
@@ -366,6 +366,43 @@ const supabase = window.supabase.createClient(
   supabaseKey
 
 );
+ document.getElementById('signupButton').addEventListener('click', async function () {
+
+  const name = document.getElementById('signupName').value;
+
+  const email = document.getElementById('signupEmail').value;
+
+  const password = document.getElementById('signupPassword').value;
+
+  const { error } = await supabase.auth.signUp({
+
+    email: email,
+
+    password: password,
+
+    options: {
+
+      data: {
+
+        full_name: name
+
+      }
+
+    }
+
+  });
+
+  if (error) {
+
+    alert('Sign up error: ' + error.message);
+
+  } else {
+
+    alert('Account created. Check your email to confirm.');
+
+  }
+
+});
 </script>
 </body>
 
