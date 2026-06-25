@@ -356,8 +356,8 @@ nav a{display:inline-block;margin:8px 10px}
 window.onload = function () {
 
   document.getElementById('signupButton').addEventListener('click', function () {
-
-    alert('Przycisk działa!');
+const email = document.getElementById('signupEmail').value;
+    alert('Email: ' + email);
 
   });
 
