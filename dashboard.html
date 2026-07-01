@@ -1,1 +1,122 @@
 
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>OneOfTwo Dashboard</title>
+
+  <style>
+
+    body {
+
+      margin: 0;
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      background: #0f172a;
+
+      color: white;
+
+      text-align: center;
+
+      padding: 80px 20px;
+
+    }
+
+    .box {
+
+      max-width: 600px;
+
+      margin: auto;
+
+      background: #020617;
+
+      border: 1px solid #1e293b;
+
+      border-radius: 20px;
+
+      padding: 40px;
+
+    }
+
+    button {
+
+      padding: 14px 28px;
+
+      border-radius: 12px;
+
+      border: none;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      background: #2563eb;
+
+      color: white;
+
+      margin-top: 20px;
+
+    }
+
+    a {
+
+      color: #93c5fd;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="box">
+
+    <h1>Welcome to OneOfTwo!</h1>
+
+    <p>You are logged in.</p>
+
+    <p>This will become your personal dashboard.</p>
+
+    <button id="logoutButton">Log out</button>
+
+    <p><a href="index.html">Back to homepage</a></p>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <script>
+
+    const supabaseUrl = 'https://lnbrqcklgndbizlhkdef.supabase.co';
+
+    const supabaseKey = 'TU_WKLEJ_TEN_SAM_SUPABASE_KEY_CO_W_INDEX';
+
+    const supabase = window.supabase.createClient(
+
+      supabaseUrl,
+
+      supabaseKey
+
+    );
+
+    document.getElementById('logoutButton').addEventListener('click', async function () {
+
+      await supabase.auth.signOut();
+
+      window.location.href = 'index.html';
+
+    });
+
+  </script>
+
+</body>
+
+</html>
