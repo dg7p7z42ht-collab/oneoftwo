@@ -80,8 +80,10 @@
   <div class="box">
 
     <h1>Welcome to OneOfTwo!</h1>
+ 
 
-    <p>You are logged in.</p>
+    <p id="userEmail">Loading user...</p>
+    
 
     <p>This will become your personal dashboard.</p>
 
@@ -106,6 +108,24 @@
       supabaseKey
 
     );
+
+    (async () => {
+
+  const { data } = await supabase.auth.getUser();
+
+  if (data.user) {
+
+    document.getElementById('userEmail').textContent =
+
+      'You are logged in as: ' + data.user.email;
+
+  } else {
+
+    window.location.href = 'index.html';
+
+  }
+
+})();
 
     document.getElementById('logoutButton').addEventListener('click', async function () {
 
