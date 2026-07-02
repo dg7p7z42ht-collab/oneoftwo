@@ -108,7 +108,6 @@
       supabaseKey
 
     );
-
     (async () => {
 
   const { data } = await supabase.auth.getUser();
@@ -126,6 +125,8 @@
   }
 
 })();
+
+
 
     document.getElementById('logoutButton').addEventListener('click', async function () {
 
