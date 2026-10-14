@@ -110,17 +110,37 @@
     );
     (async () => {
 
-  const { data } = await supabase.auth.getUser();
+  const userEmail = document.getElementById('userEmail');
 
-  if (data.user) {
+  try {
 
-    document.getElementById('userEmail').textContent =
+    const { data, error } = await supabase.auth.getSession();
 
-      'You are logged in as: ' + data.user.email;
+    if (error) {
 
-  } else {
+      throw error;
 
-    window.location.href = 'index.html';
+    }
+
+    if (data.session && data.session.user) {
+
+      userEmail.textContent =
+
+        'You are logged in as: ' + data.session.user.email;
+
+    } else {
+
+      userEmail.textContent = 'You are not logged in.';
+
+    }
+
+  } catch (error) {
+
+    console.error('Dashboard error:', error);
+
+    userEmail.textContent =
+
+      'Unable to load your account. Please try again.';
 
   }
 
