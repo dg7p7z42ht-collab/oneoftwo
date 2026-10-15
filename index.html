@@ -340,6 +340,10 @@ nav a{display:inline-block;margin:8px 10px}
 
       <input id="signupEmail" type="email" placeholder="Email address">
 
+      
+
+<button type="button" class="btn secondary" onclick="const p = document.getElementById('signupPassword'); p.type = p.type === 'password' ? 'text' : 'password'; this.textContent = p.type === 'password' ? '👁 Show password' : 'Hide password';">👁 Show password</button>
+
       <input id="signupPassword" type="password" placeholder="Create password">
 
       <button id="signupButton" class="btn secondary" type="button">Create account</button>
