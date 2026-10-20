@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Categories - OneOfTwo</title>
+
+  <style>
+
+    * { box-sizing: border-box; }
+
+    body {
+
+      margin: 0;
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      background: #0f172a;
+
+      color: white;
+
+    }
+
+    header {
+
+      background: #020617;
+
+      padding: 24px 40px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      flex-wrap: wrap;
+
+      gap: 15px;
+
+    }
+
+    .logo {
+
+      font-size: 28px;
+
+      font-weight: bold;
+
+      color: white;
+
+      text-decoration: none;
+
+    }
+
+    a { color: #93c5fd; }
+
+    .container {
+
+      max-width: 1250px;
+
+      margin: auto;
+
+      padding: 45px 25px;
+
+    }
+
+    h1 { font-size: 36px; }
+
+    .layout {
+
+      display: grid;
+
+      grid-template-columns: 250px 1fr;
+
+      gap: 25px;
+
+      margin-top: 30px;
+
+    }
+
+    .sidebar, .listing {
+
+      background: #020617;
+
+      border: 1px solid #1e293b;
+
+      border-radius: 16px;
+
+      padding: 22px;
+
+    }
+
+    .sidebar a {
+
+      display: block;
+
+      padding: 12px 0;
+
+      text-decoration: none;
+
+      color: #cbd5e1;
+
+      border-bottom: 1px solid #1e293b;
+
+    }
+
+    .sidebar a:hover,
+
+    .sidebar a.active {
+
+      color: #60a5fa;
+
+    }
+
+    .items {
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+      gap: 20px;
+
+      align-content: start;
+
+    }
+
+    .listing h3 { margin-bottom: 10px; }
+
+    .listing p { color: #cbd5e1; }
+
+    .badge {
+
+      display: inline-block;
+
+      background: #1d4ed8;
+
+      padding: 6px 12px;
+
+      border-radius: 20px;
+
+      font-size: 12px;
+
+    }
+
+    .demo {
+
+      color: #fbbf24;
+
+      font-size: 12px;
+
+      margin-top: 15px;
+
+    }
+
+    @media (max-width: 750px) {
+
+      header { padding: 20px; }
+
+      .layout { grid-template-columns: 1fr; }
+
+      .container { padding: 25px 18px; }
+
+      h1 { font-size: 28px; }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+
+    <a class="logo" href="index.html">OneOfTwo</a>
+
+    <a href="index.html">Back to homepage</a>
+
+  </header>
+
+  <main class="container">
+
+    <h1 id="categoryTitle">Fashion & Shoes</h1>
+
+    <p>Find the missing half. Browse single items and incomplete pairs.</p>
+
+    <div class="layout">
+
+      <aside class="sidebar">
+
+        <h3>Categories</h3>
+
+        <a href="listings.html?category=fashion">
+
+          👟 Fashion & Shoes
+
+        </a>
+
+        <a href="listings.html?category=jewellery">
+
+          💍 Jewellery & Watches
+
+        </a>
+
+        <a href="listings.html?category=electronics">
+
+          🎧 Electronics
+
+        </a>
+
+        <a href="listings.html?category=toys">
+
+          🧸 Toys & Games
+
+        </a>
+
+      </aside>
+
+      <section class="items" id="itemsContainer">
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+
+    const categories = {
+
+      fashion: "Fashion & Shoes",
+
+      jewellery: "Jewellery & Watches",
+
+      electronics: "Electronics",
+
+      toys: "Toys & Games"
+
+    };
+
+    const demoListings = [
+
+      {
+
+        category: "fashion",
+
+        title: "Single left sneaker",
+
+        description: "Looking for the matching right shoe.",
+
+        status: "Wanted"
+
+      },
+
+      {
+
+        category: "fashion",
+
+        title: "One black leather glove",
+
+        description: "One glove available. Looking for its match.",
+
+        status: "Available"
+
+      }
+
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+
+    const requestedCategory = params.get("category") || "fashion";
+
+    const category = categories[requestedCategory]
+
+      ? requestedCategory
+
+      : "fashion";
+
+    document.getElementById("categoryTitle").textContent =
+
+      categories[category];
+
+    const container = document.getElementById("itemsContainer");
+
+    document.querySelectorAll(".sidebar a").forEach(link => {
+
+      if (link.getAttribute("href").endsWith("category=" + category)) {
+
+        link.classList.add("active");
+
+      }
+
+    });
+
+    const matchingItems = demoListings.filter(
+
+      item => item.category === category
+
+    );
+
+    if (matchingItems.length === 0) {
+
+      container.textContent =
+
+        "No listings yet. New items will appear here soon.";
+
+    } else {
+
+      matchingItems.forEach(item => {
+
+        const card = document.createElement("article");
+
+        card.className = "listing";
+
+        const badge = document.createElement("span");
+
+        badge.className = "badge";
+
+        badge.textContent = item.status;
+
+        const title = document.createElement("h3");
+
+        title.textContent = item.title;
+
+        const description = document.createElement("p");
+
+        description.textContent = item.description;
+
+        const demo = document.createElement("p");
+
+        demo.className = "demo";
+
+        demo.textContent = "DEMO LISTING";
+
+        card.append(badge, title, description, demo);
+
+        container.appendChild(card);
+
+      });
+
+    }
+
+  </script>
+
+</body>
+
+</html>
