@@ -228,7 +228,58 @@ nav a{display:inline-block;margin:8px 10px}
 
       <div class="card"><h3>🧩 Missing Parts</h3><ul><li>Single components</li><li>Set pieces</li><li>Pair matching</li><li>Replacement elements</li><li>One of two items</li></ul></div>
 
-    </div>
+    </div> 
+    
+
+<script>
+
+(() => {
+
+  const grid = document.querySelector(
+
+    'a[href="listings.html?category=fashion"]'
+
+  ).parentElement;
+
+  const categoryNames = [
+
+    "jewellery",
+
+    "home",
+
+    "automotive",
+
+    "electronics",
+
+    "tools",
+
+    "toys",
+
+    "collectibles",
+
+    "lost",
+
+    "parts"
+
+  ];
+
+  grid.querySelectorAll(":scope > div.card").forEach((card, index) => {
+
+    const link = document.createElement("a");
+
+    link.href = "listings.html?category=" + categoryNames[index];
+
+    link.style.cssText = "color:inherit;text-decoration:none;";
+
+    card.before(link);
+
+    link.appendChild(card);
+
+  });
+
+})();
+
+</script>
 
   </div>
 
