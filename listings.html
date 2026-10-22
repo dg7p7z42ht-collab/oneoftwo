@@ -298,7 +298,7 @@ const categories = {
     const demoListings = [
 
       {
-
+  id: "shoe",
         category: "fashion",
 
         title: "Single left sneaker",
@@ -310,7 +310,7 @@ const categories = {
       },
 
       {
-
+     id: "glove",
         category: "fashion",
 
         title: "One black leather glove",
@@ -365,9 +365,12 @@ const categories = {
 
       matchingItems.forEach(item => {
 
-        const card = document.createElement("article");
+        const card = document.createElement("a");
 
         card.className = "listing";
+        card.href = "listing.html?id=" + encodeURIComponent(item.id);
+
+card.style.cssText = "display:block; color:inherit; text-decoration:none;";
 
         const badge = document.createElement("span");
 
