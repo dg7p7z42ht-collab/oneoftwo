@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Listing Details - OneOfTwo</title>
+
+  <style>
+
+    * {
+
+      box-sizing: border-box;
+
+    }
+
+    body {
+
+      margin: 0;
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      background: #0f172a;
+
+      color: white;
+
+    }
+
+    header {
+
+      background: #020617;
+
+      padding: 24px;
+
+    }
+
+    .logo {
+
+      color: white;
+
+      font-size: 28px;
+
+      font-weight: bold;
+
+      text-decoration: none;
+
+    }
+
+    main {
+
+      max-width: 1100px;
+
+      margin: auto;
+
+      padding: 30px 20px;
+
+    }
+
+    a {
+
+      color: #93c5fd;
+
+    }
+
+    .back {
+
+      display: inline-block;
+
+      margin-bottom: 25px;
+
+    }
+
+    h1 {
+
+      font-size: 36px;
+
+      margin-bottom: 15px;
+
+    }
+
+    .badge {
+
+      display: inline-block;
+
+      background: #1d4ed8;
+
+      padding: 9px 16px;
+
+      border-radius: 20px;
+
+      font-weight: bold;
+
+    }
+
+    .layout {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 24px;
+
+      margin-top: 30px;
+
+    }
+
+    .panel {
+
+      background: #020617;
+
+      border: 1px solid #334155;
+
+      border-radius: 18px;
+
+      padding: 25px;
+
+    }
+
+    .photo {
+
+      min-height: 300px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      background: #1e293b;
+
+      border: 2px dashed #475569;
+
+      border-radius: 14px;
+
+      color: #94a3b8;
+
+      text-align: center;
+
+      padding: 20px;
+
+    }
+
+    .field {
+
+      padding: 12px 0;
+
+      border-bottom: 1px solid #1e293b;
+
+    }
+
+    .field strong {
+
+      display: block;
+
+      color: #93c5fd;
+
+      margin-bottom: 6px;
+
+    }
+
+    .description {
+
+      line-height: 1.7;
+
+    }
+
+    .future {
+
+      margin-top: 24px;
+
+      padding: 18px;
+
+      background: #172554;
+
+      border-radius: 14px;
+
+      color: #bfdbfe;
+
+    }
+
+    @media (max-width: 700px) {
+
+      .layout {
+
+        grid-template-columns: 1fr;
+
+      }
+
+      h1 {
+
+        font-size: 28px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+
+    <a class="logo" href="index.html">OneOfTwo</a>
+
+  </header>
+
+  <main>
+
+    <a class="back" id="backLink"
+
+       href="listings.html?category=fashion">
+
+      ← Back to Fashion & Shoes
+
+    </a>
+
+    <h1 id="listingTitle">Loading listing...</h1>
+
+    <span class="badge" id="listingStatus"></span>
+
+    <p id="categoryName"></p>
+
+    <div class="layout">
+
+      <section class="panel">
+
+        <div class="photo">
+
+          📷 Photo will appear here
+
+        </div>
+
+        <div class="future">
+
+          AI matching suggestions will appear here
+
+          in a future version of OneOfTwo.
+
+        </div>
+
+      </section>
+
+      <section class="panel">
+
+        <h2>Item Details</h2>
+
+        <div class="field">
+
+          <strong>I have</strong>
+
+          <span id="itemHave"></span>
+
+        </div>
+
+        <div class="field">
+
+          <strong>I am looking for</strong>
+
+          <span id="itemWanted"></span>
+
+        </div>
+
+        <div class="field">
+
+          <strong>Brand</strong>
+
+          <span id="itemBrand"></span>
+
+        </div>
+
+        <div class="field">
+
+          <strong>Model</strong>
+
+          <span id="itemModel"></span>
+
+        </div>
+
+        <div class="field">
+
+          <strong>Size</strong>
+
+          <span id="itemSize"></span>
+
+        </div>
+
+        <h2>Description</h2>
+
+        <p class="description" id="itemDescription"></p>
+
+        <p><strong>DEMO LISTING</strong></p>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+
+    const demoListings = {
+
+      shoe: {
+
+        title: "Single left sneaker",
+
+        status: "Wanted",
+
+        category: "Fashion & Shoes",
+
+        have: "Left sneaker",
+
+        wanted: "Matching right sneaker",
+
+        brand: "Not specified",
+
+        model: "Not specified",
+
+        size: "Not specified",
+
+        description: "Looking for the matching right shoe."
+
+      },
+
+      glove: {
+
+        title: "One black leather glove",
+
+        status: "Available",
+
+        category: "Fashion & Shoes",
+
+        have: "One black leather glove",
+
+        wanted: "Matching glove",
+
+        brand: "Not specified",
+
+        model: "Not specified",
+
+        size: "Not specified",
+
+        description: "One glove available. Looking for its match."
+
+      }
+
+    };
+
+    const params = new URLSearchParams(window.location.search);
+
+    const listingId = params.get("id") || "shoe";
+
+    const item = demoListings[listingId];
+
+    function showText(elementId, value) {
+
+      document.getElementById(elementId).textContent = value;
+
+    }
+
+    if (item) {
+
+      showText("listingTitle", item.title);
+
+      showText("listingStatus", item.status);
+
+      showText("categoryName", item.category);
+
+      showText("itemHave", item.have);
+
+      showText("itemWanted", item.wanted);
+
+      showText("itemBrand", item.brand);
+
+      showText("itemModel", item.model);
+
+      showText("itemSize", item.size);
+
+      showText("itemDescription", item.description);
+
+    } else {
+
+      showText("listingTitle", "Listing not found");
+
+      showText("listingStatus", "Unavailable");
+
+      showText("itemDescription",
+
+        "This listing does not exist.");
+
+    }
+
+  </script>
+
+</body>
+
+</html>
