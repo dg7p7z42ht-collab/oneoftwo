@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Add a Listing | OneOfTwo</title>
+
+  <style>
+
+    * { box-sizing: border-box; }
+
+    body {
+
+      margin: 0;
+
+      font-family: Arial, sans-serif;
+
+      background: #f3f6fa;
+
+      color: #17243a;
+
+    }
+
+    header {
+
+      background: #14233e;
+
+      color: white;
+
+      padding: 22px;
+
+      text-align: center;
+
+    }
+
+    header h1 { margin: 0; }
+
+    header p {
+
+      margin: 8px 0 0;
+
+      opacity: 0.85;
+
+    }
+
+    main {
+
+      max-width: 650px;
+
+      margin: 35px auto;
+
+      padding: 0 18px;
+
+    }
+
+    .panel {
+
+      background: white;
+
+      border-radius: 18px;
+
+      padding: 28px;
+
+      box-shadow: 0 8px 30px #14233e12;
+
+    }
+
+    h2 { margin-top: 0; }
+
+    .choices {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+      margin: 24px 0;
+
+    }
+
+    .choice { cursor: pointer; }
+
+    .choice input {
+
+      position: absolute;
+
+      opacity: 0;
+
+    }
+
+    .choice span {
+
+      display: block;
+
+      text-align: center;
+
+      padding: 24px 10px;
+
+      border: 2px solid #d8e0eb;
+
+      border-radius: 14px;
+
+      font-weight: bold;
+
+    }
+
+    .choice input:checked + span {
+
+      border-color: #168b77;
+
+      background: #e8f8f3;
+
+      color: #086b5a;
+
+    }
+
+    .choice input:focus-visible + span {
+
+      outline: 3px solid #168b77;
+
+      outline-offset: 3px;
+
+    }
+
+    label.field {
+
+      display: block;
+
+      margin: 18px 0;
+
+      font-weight: bold;
+
+    }
+
+    input[type="text"], textarea {
+
+      width: 100%;
+
+      padding: 13px;
+
+      margin-top: 8px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 9px;
+
+      font: inherit;
+
+    }
+
+    textarea {
+
+      min-height: 110px;
+
+      resize: vertical;
+
+    }
+
+    button {
+
+      width: 100%;
+
+      padding: 15px;
+
+      border: 0;
+
+      border-radius: 10px;
+
+      background: #168b77;
+
+      color: white;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+    }
+
+    #preview {
+
+      margin-top: 22px;
+
+      padding: 18px;
+
+      background: #f3f6fa;
+
+      border-radius: 12px;
+
+    }
+
+    .note {
+
+      color: #627086;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+
+    }
+
+    .back {
+
+      display: block;
+
+      margin-top: 22px;
+
+      color: #168b77;
+
+      text-align: center;
+
+    }
+
+    @media (max-width: 420px) {
+
+      .panel { padding: 18px; }
+
+      .choices { grid-template-columns: 1fr; }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+
+    <h1>OneOfTwo</h1>
+
+    <p>Find the missing half</p>
+
+  </header>
+
+  <main>
+
+    <section class="panel">
+
+      <h2>Add a listing</h2>
+
+      <p>Every missing half deserves a chance.</p>
+
+      <form id="listingForm">
+
+        <p><strong>What would you like to do?</strong></p>
+
+        <div class="choices">
+
+          <label class="choice">
+
+            <input type="radio" name="type"
+
+                   value="available" checked>
+
+            <span>📦 I HAVE</span>
+
+          </label>
+
+          <label class="choice">
+
+            <input type="radio" name="type"
+
+                   value="wanted">
+
+            <span>🔎 I'M LOOKING FOR</span>
+
+          </label>
+
+        </div>
+
+        <label class="field">
+
+          Item name
+
+          <input type="text" id="itemTitle"
+
+                 placeholder="e.g. Nike Air Max 90"
+
+                 maxlength="120" required>
+
+        </label>
+
+        <label class="field">
+
+          Description
+
+          <textarea id="itemDescription"
+
+                    placeholder="Describe your item or the missing half..."></textarea>
+
+        </label>
+
+        <button type="submit">Preview listing</button>
+
+      </form>
+
+      <div id="preview" hidden>
+
+        <h3>Your listing preview</h3>
+
+        <p id="previewType"></p>
+
+        <h4 id="previewTitle"></h4>
+
+        <p id="previewDescription"></p>
+
+        <p class="note">
+
+          This is a preview only.
+
+          Your listing has not been published.
+
+        </p>
+
+      </div>
+
+      <p class="note">
+
+        First version of the OneOfTwo listing form.
+
+        Database saving will be added later.
+
+      </p>
+
+    </section>
+
+    <a class="back" href="index.html">
+
+      Back to OneOfTwo
+
+    </a>
+
+  </main>
+
+  <script>
+
+    document.getElementById("listingForm")
+
+      .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const type = document.querySelector(
+
+          'input[name="type"]:checked'
+
+        ).value;
+
+        const title = document.getElementById(
+
+          "itemTitle"
+
+        ).value;
+
+        const description = document.getElementById(
+
+          "itemDescription"
+
+        ).value;
+
+        document.getElementById("previewType")
+
+          .textContent = type === "available"
+
+          ? "I HAVE"
+
+          : "I'M LOOKING FOR";
+
+        document.getElementById("previewTitle")
+
+          .textContent = title;
+
+        document.getElementById("previewDescription")
+
+          .textContent = description;
+
+        document.getElementById("preview").hidden = false;
+
+      });
+
+  </script>
+
+</body>
+
+</html>
