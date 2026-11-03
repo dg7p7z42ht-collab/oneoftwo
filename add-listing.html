@@ -264,6 +264,13 @@
       <h2>Add a listing</h2>
 
       <p>Every missing half deserves a chance.</p>
+      
+
+<p id="authStatus" class="note" role="status">
+
+  Checking sign-in status...
+
+</p>
 
       <form id="listingForm">
 
@@ -404,7 +411,45 @@
       });
 
   </script>
+ 
 
+<script>
+
+  document.addEventListener("DOMContentLoaded", async () => {
+
+    const status = document.getElementById("authStatus");
+
+    try {
+
+      const { data: { user }, error } =
+
+        await supabaseClient.auth.getUser();
+
+      if (error || !user) {
+
+        status.textContent =
+
+          "Please sign in to save a listing.";
+
+      } else {
+
+        status.textContent =
+
+          "You are signed in.";
+
+      }
+
+    } catch (error) {
+
+      status.textContent =
+
+        "Unable to check sign-in status.";
+
+    }
+
+  });
+
+</script>
 </body>
 
 </html>
