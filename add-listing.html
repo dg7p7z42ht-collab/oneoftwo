@@ -323,6 +323,17 @@
         </label>
 
         <button type="submit">Preview listing</button>
+        
+
+<button type="button" id="saveDraftButton"
+
+        style="margin-top: 12px;" disabled>
+
+  Save as draft
+
+</button>
+
+<p id="saveDraftStatus" class="note" role="status"></p>
 
       </form>
 
@@ -436,6 +447,9 @@
         status.textContent =
 
           "You are signed in.";
+        
+
+document.getElementById("saveDraftButton").disabled = false;
 
       }
 
@@ -446,6 +460,89 @@
         "Unable to check sign-in status.";
 
     }
+
+  });
+
+</script>
+  
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const button = document.getElementById("saveDraftButton");
+
+    const status = document.getElementById("saveDraftStatus");
+
+    button.addEventListener("click", async () => {
+
+      const title = document.getElementById("itemTitle").value.trim();
+
+      const description = document.getElementById("itemDescription").value.trim();
+
+      const listingType = document.querySelector(
+
+        'input[name="type"]:checked'
+
+      ).value;
+
+      if (!title) {
+
+        status.textContent = "Please enter an item name.";
+
+        return;
+
+      }
+
+      button.disabled = true;
+
+      status.textContent = "Saving your draft...";
+
+      try {
+
+        const { data: { user }, error: authError } =
+
+          await supabaseClient.auth.getUser();
+
+        if (authError || !user) {
+
+          throw new Error("Please sign in first.");
+
+        }
+
+        const { error } = await supabaseClient
+
+          .from("listings")
+
+          .insert({
+
+            user_id: user.id,
+
+            title: title,
+
+            description: description,
+
+            listing_type: listingType,
+
+            publication_status: "draft"
+
+          });
+
+        if (error) throw error;
+
+        status.textContent = "Draft saved successfully!";
+
+      } catch (error) {
+
+        status.textContent = "Save failed: " + error.message;
+
+      } finally {
+
+        button.disabled = false;
+
+      }
+
+    });
 
   });
 
