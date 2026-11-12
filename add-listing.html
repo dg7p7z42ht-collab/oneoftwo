@@ -366,8 +366,19 @@
 
 </button>
 
-<p id="saveDraftStatus" class="note" role="status"></p>
+<p id="saveDraftStatus" class="note" role="status"></p> 
+      
 
+
+<button type="button" id="publishListingButton"
+
+        style="margin-top: 12px;" disabled>
+
+  Publish listing
+
+</button>
+
+<p id="publishStatus" class="note" role="status"></p>
       </form>
 
       <div id="preview" hidden>
@@ -482,7 +493,10 @@
           "You are signed in.";
         
 
-document.getElementById("saveDraftButton").disabled = false;
+document.getElementById("saveDraftButton").disabled = false; 
+  
+
+document.getElementById("publishListingButton").disabled = false;
 
       }
 
@@ -592,6 +606,105 @@ category: document.getElementById("itemCategory").value,
     });
 
   });
+
+</script> 
+  
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const button = document.getElementById("publishListingButton");
+
+  const status = document.getElementById("publishStatus");
+
+  button.addEventListener("click", async () => {
+
+    const title = document.getElementById("itemTitle").value.trim();
+
+    const description = document.getElementById("itemDescription").value.trim();
+
+    const category = document.getElementById("itemCategory").value;
+
+    const listingType = document.querySelector(
+
+      'input[name="type"]:checked'
+
+    ).value;
+
+    if (!title) {
+
+      status.textContent = "Please enter an item name.";
+
+      return;
+
+    }
+
+    if (!category) {
+
+      status.textContent = "Please select a category.";
+
+      return;
+
+    }
+
+    if (!confirm("Publish this listing for everyone to see?")) {
+
+      return;
+
+    }
+
+    button.disabled = true;
+
+    status.textContent = "Publishing your listing...";
+
+    try {
+
+      const { data: { user }, error: authError } =
+
+        await supabaseClient.auth.getUser();
+
+      if (authError || !user) {
+
+        throw new Error("Please sign in first.");
+
+      }
+
+      const { error } = await supabaseClient
+
+        .from("listings")
+
+        .insert({
+
+          user_id: user.id,
+
+          title: title,
+
+          description: description,
+
+          category: category,
+
+          listing_type: listingType,
+
+          publication_status: "published"
+
+        });
+
+      if (error) throw error;
+
+      status.textContent = "Listing published successfully!";
+
+    } catch (error) {
+
+      status.textContent = "Publishing failed: " + error.message;
+
+      button.disabled = false;
+
+    }
+
+  });
+
+});
 
 </script>
 </body>
