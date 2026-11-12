@@ -10,7 +10,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Categories - OneOfTwo</title>
+  <title>Categories - OneOfTwo</title> 
+  
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <style>
 
@@ -271,6 +274,16 @@
 
     
 
+const listingsSupabase = window.supabase.createClient(
+
+  "https://lnbrqcklgndbizlhkdef.supabase.co",
+
+  "sb_publishable_EzhbUdb-HgoZ6hYtuvLfgQ_sY2fvRXW"
+
+);
+
+
+
 const categories = {
 
   fashion: "Fashion & Shoes",
@@ -398,7 +411,76 @@ card.style.cssText = "display:block; color:inherit; text-decoration:none;";
 
       });
 
-    }
+    } 
+    
+
+async function loadPublishedListings() {
+
+  container.textContent = "Loading listings...";
+
+  const { data, error } = await listingsSupabase
+
+    .from("listings")
+
+    .select("id, title, description, listing_type, category")
+
+    .eq("publication_status", "published")
+
+    .eq("category", category)
+
+    .order("created_at", { ascending: false });
+
+  if (error) {
+
+    console.error(error);
+
+    container.textContent = "Unable to load listings.";
+
+    return;
+
+  }
+
+  container.replaceChildren();
+
+  if (!data || data.length === 0) {
+
+    container.textContent = "No published listings yet.";
+
+    return;
+
+  }
+
+  data.forEach(item => {
+
+    const card = document.createElement("article");
+
+    card.className = "listing";
+
+    const badge = document.createElement("span");
+
+    badge.className = "badge";
+
+    badge.textContent =
+
+      item.listing_type === "wanted" ? "Wanted" : "Available";
+
+    const title = document.createElement("h3");
+
+    title.textContent = item.title;
+
+    const description = document.createElement("p");
+
+    description.textContent = item.description || "";
+
+    card.append(badge, title, description);
+
+    container.appendChild(card);
+
+  });
+
+}
+
+loadPublishedListings();
 
   </script>
 
