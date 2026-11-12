@@ -310,7 +310,40 @@
 
                  maxlength="120" required>
 
-        </label>
+        </label> 
+        
+
+<label class="field">
+
+  Category
+
+  <select id="itemCategory" required>
+
+    <option value="" selected disabled>Select category</option>
+
+    <option value="fashion">Fashion & Shoes</option>
+
+    <option value="jewellery">Jewellery & Watches</option>
+
+    <option value="home">Home & Living</option>
+
+    <option value="automotive">Automotive</option>
+
+    <option value="electronics">Electronics</option>
+
+    <option value="tools">Tools & Hardware</option>
+
+    <option value="toys">Toys & Games</option>
+
+    <option value="collectibles">Collectibles & Sets</option>
+
+    <option value="lost">Lost & Found</option>
+
+    <option value="parts">Missing Parts</option>
+
+  </select>
+
+</label>
 
         <label class="field">
 
@@ -492,7 +525,16 @@ document.getElementById("saveDraftButton").disabled = false;
 
         return;
 
-      }
+      } 
+      
+
+if (!document.getElementById("itemCategory").value) {
+
+  status.textContent = "Please select a category.";
+
+  return;
+
+}
 
       button.disabled = true;
 
@@ -518,7 +560,12 @@ document.getElementById("saveDraftButton").disabled = false;
 
             user_id: user.id,
 
-            title: title,
+            title: title, 
+            
+
+
+category: document.getElementById("itemCategory").value,
+            
 
             description: description,
 
