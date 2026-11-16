@@ -422,7 +422,7 @@ async function loadPublishedListings() {
 
     .from("listings")
 
-    .select("id, title, description, listing_type, category")
+    .select("id, title, description, listing_type, category, image_url")
 
     .eq("publication_status", "published")
 
@@ -473,7 +473,33 @@ async function loadPublishedListings() {
     description.textContent = item.description || "";
 
     card.append(badge, title, description);
+ 
 
+if (item.image_url) {
+
+  const photo = document.createElement("img");
+
+  photo.src = item.image_url;
+
+  photo.alt = item.title || "Listing photo";
+
+  photo.loading = "lazy";
+
+  photo.style.width = "100%";
+
+  photo.style.maxWidth = "360px";
+
+  photo.style.height = "auto";
+
+  photo.style.display = "block";
+
+  photo.style.marginTop = "12px";
+
+  photo.style.borderRadius = "10px";
+
+  card.appendChild(photo);
+
+}
     container.appendChild(card);
 
   });
