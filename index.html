@@ -232,19 +232,33 @@ nav a{display:inline-block;margin:8px 10px}
 
   <ul>
 
-    <li>Cycling &amp; Bike Parts</li>
+    
 
-    <li>Winter Sports</li>
+<li><a href="listings.html?category=sports&amp;subcategory=cycling">Cycling &amp; Bike Parts</a></li>
 
-    <li>Fitness &amp; Training</li>
+    
 
-    <li>Water Sports</li>
+<li><a href="listings.html?category=sports&amp;subcategory=winter">Winter Sports</a></li>
 
-    <li>Camping &amp; Hiking</li>
+    
 
-    <li>Motorsports</li>
+<li><a href="listings.html?category=sports&amp;subcategory=fitness">Fitness &amp; Training</a></li>
 
-    <li>Other Sports</li>
+    
+
+<li><a href="listings.html?category=sports&amp;subcategory=water">Water Sports</a></li>
+
+    
+
+<li><a href="listings.html?category=sports&amp;subcategory=camping">Camping &amp; Hiking</a></li>
+
+    
+
+<li><a href="listings.html?category=sports&amp;subcategory=motorsports">Motorsports</a></li>
+
+    
+
+<li><a href="listings.html?category=sports&amp;subcategory=other">Other Sports</a></li>
 
   </ul>
 
@@ -299,7 +313,11 @@ nav a{display:inline-block;margin:8px 10px}
 
   ];
 
-  grid.querySelectorAll(":scope > div.card").forEach((card, index) => {
+  grid.querySelectorAll(":scope > div.card").forEach((card, index) => { 
+
+    
+
+if (categoryNames[index] === "sports") return;
 
     const link = document.createElement("a");
 
