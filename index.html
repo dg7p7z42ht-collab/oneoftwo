@@ -78,13 +78,28 @@ form input,form textarea,form select,.auth-card input{width:100%;max-width:560px
 
 textarea{min-height:120px}
 
-.auth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;margin-top:25px}
+.auth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:25px;margin-top:25px}
 
-.auth-card{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.auth-card{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:clamp(18px,4vw,28px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
 
-.auth-card h3{font-size:28px;margin-bottom:12px}
+.auth-card h3{font-size:28px;margin:0 0 18px}
 
-.auth-card p{color:#cbd5e1;margin-bottom:18px}
+.auth-form{max-width:560px}
+.auth-field{display:grid;gap:6px;margin-bottom:16px}
+.auth-field label{color:#e2e8f0;font-weight:700}
+.auth-form input{min-width:0;margin:0}
+.auth-form .btn{margin:0}
+.auth-password{display:flex;flex-wrap:wrap;gap:8px}
+.auth-password input{flex:1 1 10rem}
+.auth-password .btn{padding:12px;white-space:nowrap}
+.auth-form :is(input,button,a):focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+.auth-form p{color:#cbd5e1;margin:0}
+.auth-form p:not(:empty){margin-top:12px}
+.auth-form a{color:#93c5fd}
+
+@media(max-width:700px){
+  .auth-grid{grid-template-columns:minmax(0,1fr)}
+}
 
 footer{background:#020617;color:#94a3b8;text-align:center;padding:35px}
 
@@ -422,12 +437,18 @@ if (categoryNames[index] === "sports") return;
   <div class="auth-grid">
     <div class="auth-card">
       <h3>Login</h3>
-      <form id="loginForm" aria-describedby="loginStatus">
-        <label for="loginEmail">Email address</label>
-        <input id="loginEmail" type="email" autocomplete="username" required>
-        <label for="loginPassword">Password</label>
-        <input id="loginPassword" type="password" autocomplete="current-password" required>
-        <button type="button" class="btn secondary" data-password="loginPassword">Show password</button>
+      <form class="auth-form" id="loginForm" aria-describedby="loginStatus">
+        <div class="auth-field">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" type="email" autocomplete="username" required>
+        </div>
+        <div class="auth-field">
+          <label for="loginPassword">Password</label>
+          <div class="auth-password">
+            <input id="loginPassword" type="password" autocomplete="current-password" required>
+            <button type="button" class="btn secondary" data-password="loginPassword">Show password</button>
+          </div>
+        </div>
         <button class="btn primary" type="submit">Login</button>
         <p id="loginStatus" role="status"></p>
         <p id="loginResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
@@ -435,14 +456,22 @@ if (categoryNames[index] === "sports") return;
     </div>
     <div class="auth-card" id="signup">
       <h3>Create account</h3>
-      <form id="signupForm" aria-describedby="signupStatus">
-        <label for="signupName">Full name</label>
-        <input id="signupName" type="text" autocomplete="name" required>
-        <label for="signupEmail">Email address</label>
-        <input id="signupEmail" type="email" autocomplete="username" required>
-        <label for="signupPassword">Password</label>
-        <input id="signupPassword" type="password" autocomplete="new-password" required>
-        <button type="button" class="btn secondary" data-password="signupPassword">Show password</button>
+      <form class="auth-form" id="signupForm" aria-describedby="signupStatus">
+        <div class="auth-field">
+          <label for="signupName">Full name</label>
+          <input id="signupName" type="text" autocomplete="name" required>
+        </div>
+        <div class="auth-field">
+          <label for="signupEmail">Email address</label>
+          <input id="signupEmail" type="email" autocomplete="username" required>
+        </div>
+        <div class="auth-field">
+          <label for="signupPassword">Password</label>
+          <div class="auth-password">
+            <input id="signupPassword" type="password" autocomplete="new-password" required>
+            <button type="button" class="btn secondary" data-password="signupPassword">Show password</button>
+          </div>
+        </div>
         <button class="btn secondary" type="submit">Create account</button>
         <p id="signupStatus" role="status"></p>
         <p id="signupResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
