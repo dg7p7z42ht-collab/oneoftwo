@@ -418,148 +418,130 @@ if (categoryNames[index] === "sports") return;
 </section>
 
 <section id="login" class="section">
-
   <h2>Login or create account</h2>
-
   <div class="auth-grid">
-
     <div class="auth-card">
-
       <h3>Login</h3>
-
-      <p>Access your listings, saved searches and future matches.</p>
-
-      <input id="loginEmail" type="email" placeholder="Email address">
-
-      <input id="loginPassword" type="password" placeholder="Password">
-      
-
-<button type="button" class="btn secondary" onclick="const p = document.getElementById('loginPassword'); p.type = p.type === 'password' ? 'text' : 'password'; this.textContent = p.type === 'password' ? '👁 Show password' : 'Hide password';">👁 Show password</button>
-      <button id="loginButton" class="btn primary" type="button">Login</button>
-
+      <form id="loginForm" aria-describedby="loginStatus">
+        <label for="loginEmail">Email address</label>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+        <button type="button" class="btn secondary" data-password="loginPassword">Show password</button>
+        <button class="btn primary" type="submit">Login</button>
+        <p id="loginStatus" role="status"></p>
+        <p id="loginResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
+      </form>
     </div>
-
-    <div id="signup" class="auth-card">
-
-      <h3>Sign Up</h3>
-
-      <p>Create your OneOfTwo account and start adding items.</p>
-
-      <input id="signupName" type="text" placeholder="Full name">
-
-      <input id="signupEmail" type="email" placeholder="Email address">
-
-      
-
-<button type="button" class="btn secondary" onclick="const p = document.getElementById('signupPassword'); p.type = p.type === 'password' ? 'text' : 'password'; this.textContent = p.type === 'password' ? '👁 Show password' : 'Hide password';">👁 Show password</button>
-
-      <input id="signupPassword" type="password" placeholder="Create password">
-
-      <button id="signupButton" class="btn secondary" type="button">Create account</button>
-
+    <div class="auth-card" id="signup">
+      <h3>Create account</h3>
+      <form id="signupForm" aria-describedby="signupStatus">
+        <label for="signupName">Full name</label>
+        <input id="signupName" type="text" autocomplete="name" required>
+        <label for="signupEmail">Email address</label>
+        <input id="signupEmail" type="email" autocomplete="username" required>
+        <label for="signupPassword">Password</label>
+        <input id="signupPassword" type="password" autocomplete="new-password" required>
+        <button type="button" class="btn secondary" data-password="signupPassword">Show password</button>
+        <button class="btn secondary" type="submit">Create account</button>
+        <p id="signupStatus" role="status"></p>
+        <p id="signupResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
+      </form>
     </div>
-
   </div>
-
 </section>
 
 <footer>
  © 2026 OneOfTwo — Find the missing half.
 </footer> 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="auth.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const loginEmail = document.getElementById('loginEmail');
+  const signupEmail = document.getElementById('signupEmail');
+  const signupName = document.getElementById('signupName');
 
-const supabaseUrl = 'https://lnbrqcklgndbizlhkdef.supabase.co';
-
-const supabaseKey = 'sb_publishable_EzhbUdb-HgoZ6hYtuvLfgQ_sY2fvRXW';
-
-
-
-window.onload = function () {
-
-  document.getElementById('signupButton').addEventListener('click', async function () {
-
-    const name = document.getElementById('signupName').value;
-
-    const email = document.getElementById('signupEmail').value;
-
-    const password = document.getElementById('signupPassword').value;
-    
-    const supabase = window.supabase.createClient(
-
-  supabaseUrl,
-
-  supabaseKey
-
-);
-    const { data, error } = await supabase.auth.signUp({
-
-  email: email,
-
-  password: password,
-
-  options: {
-
-    data: {
-
-      full_name: name
-
-    }
-
+  const logoutNotice = new URLSearchParams(window.location.search).get('auth_notice');
+  if (logoutNotice === 'signed_out_locally') {
+    document.getElementById('loginStatus').textContent =
+      'Signed out of this browser. The server did not confirm sign-out.';
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
   }
 
-});
-
-if (error) {
-
-  alert('Sign up error: ' + error.message);
-
-} else {
-
-  alert('Account created! Please checck your e-mail.');
-
-}
-
-  });
-document.getElementById('loginButton').addEventListener('click', async function () {
-
-  const email = document.getElementById('loginEmail').value;
-
-  const password = document.getElementById('loginPassword').value;
-
-  const supabase = window.supabase.createClient(
-
-    supabaseUrl,
-
-    supabaseKey
-
-  );
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-
-    email: email,
-
-    password: password
-
+  document.querySelectorAll('[data-password]').forEach(button => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.password);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      button.textContent = input.type === 'password' ? 'Show password' : 'Hide password';
+    });
   });
 
-  if (error) {
+  function handleSubmit(formId, statusId, resendId, pending, fallback, submit) {
+    const form = document.getElementById(formId);
+    const status = document.getElementById(statusId);
+    const resendLink = document.getElementById(resendId);
+    const button = form.querySelector('button[type="submit"]');
 
-    alert('Login error: ' + error.message);
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (button.disabled) return;
 
-  } else {
-
-    window.location.href = 'dashboard.html';
-
+      resendLink.hidden = true;
+      button.disabled = true;
+      status.textContent = pending;
+      try {
+        status.textContent = await submit(resendLink) ?? '';
+      } catch (error) {
+        status.textContent = OneOfTwoAuth.errorMessage(error, fallback);
+      } finally {
+        button.disabled = false;
+      }
+    });
   }
 
+  handleSubmit('signupForm', 'signupStatus', 'signupResendLink',
+    'Creating your account…', 'Unable to sign up. Please try again.', async resendLink => {
+      const name = signupName.value.trim();
+      if (!name) return 'Enter your full name.';
+
+      const { data, error } = await OneOfTwoAuth.getClient().auth.signUp({
+        email: signupEmail.value.trim(),
+        password: document.getElementById('signupPassword').value,
+        options: {
+          data: { full_name: name },
+          emailRedirectTo: OneOfTwoAuth.confirmationUrl()
+        }
+      });
+      if (error && error.code !== 'user_already_exists' && error.code !== 'email_exists') {
+        throw error;
+      }
+
+      if (data?.session) {
+        window.location.assign('dashboard.html');
+        return;
+      }
+
+      resendLink.hidden = false;
+      return 'If this address can be registered, you’ll receive a confirmation link. Check your inbox and spam folder.';
+    });
+
+  handleSubmit('loginForm', 'loginStatus', 'loginResendLink',
+    'Signing in…', 'Unable to sign in. Please try again.', async resendLink => {
+      const { data, error } = await OneOfTwoAuth.getClient().auth.signInWithPassword({
+        email: loginEmail.value.trim(),
+        password: document.getElementById('loginPassword').value
+      });
+      if (error) {
+        resendLink.hidden = error.code !== 'email_not_confirmed';
+        throw error;
+      }
+      if (!data?.session) return 'Sign-in did not start a session. Please try again.';
+
+      window.location.assign('dashboard.html');
+    });
 });
-};
-
-
-
 </script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Confirm your email | OneOfTwo</title>
+  <style>
+    body { margin: 0; font: 1rem system-ui, sans-serif; background: #f3f6fa; color: #17243a; }
+    main { max-width: 32rem; margin: 4rem auto; padding: 0 1.25rem; }
+    label, input { display: block; }
+    input, button { margin: 0.5rem 0; padding: 0.6rem; font: inherit; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Confirm your email</h1>
+    <p id="confirmationStatus" role="status">Checking confirmation link…</p>
+    <p><a href="index.html#login">Back to sign in</a></p>
+    <form id="resendForm" hidden>
+      <label for="resendEmail">Email address</label>
+      <input id="resendEmail" type="email" autocomplete="username" required>
+      <button type="submit">Resend confirmation email</button>
+      <p id="resendStatus" role="status"></p>
+    </form>
+  </main>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="auth.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const status = document.getElementById('confirmationStatus');
+    const form = document.getElementById('resendForm');
+    const resendStatus = document.getElementById('resendStatus');
+    const button = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (button.disabled) return;
+
+      button.disabled = true;
+      resendStatus.textContent = 'Sending confirmation email…';
+      try {
+        const email = document.getElementById('resendEmail').value.trim();
+        const { error } = await OneOfTwoAuth.resendConfirmation(email);
+        if (error && error.code !== 'user_not_found' && error.code !== 'email_exists') {
+          throw error;
+        }
+        resendStatus.textContent = 'If this address needs confirmation, you’ll receive a link. Check your inbox and spam folder.';
+      } catch (error) {
+        resendStatus.textContent = OneOfTwoAuth.errorMessage(
+          error, 'Unable to resend the confirmation email. Please try again.'
+        );
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    const url = new URL(window.location.href);
+    const fragment = new URLSearchParams(url.hash.slice(1));
+    const errorCode = fragment.get('error_code') ?? url.searchParams.get('error_code');
+    const linkError = fragment.has('error') || url.searchParams.has('error') || errorCode;
+    const accessToken = fragment.get('access_token');
+    const refreshToken = fragment.get('refresh_token');
+    const isSignup = fragment.get('type') === 'signup';
+
+    // Remove callback parameters from the address bar and browser history.
+    window.history.replaceState(null, '', url.pathname);
+
+    if (url.hash === '#resend') {
+      status.textContent = 'Enter the address you used to create your account.';
+      form.hidden = false;
+      return;
+    }
+
+    if (linkError || !isSignup || !accessToken || !refreshToken) {
+      status.textContent = errorCode === 'otp_expired'
+        ? 'This confirmation link has expired or was already used. Try signing in or request a new link.'
+        : 'No valid confirmation link was found. Try signing in or request a new link.';
+      form.hidden = false;
+      return;
+    }
+
+    try {
+      // Install only the session returned by this confirmation link.
+      const { data, error } = await OneOfTwoAuth.getClient().auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      });
+      if (error) throw error;
+      if (data.session) {
+        window.location.replace('dashboard.html');
+        return;
+      }
+      status.textContent = 'No session was started. Try signing in or request a new link.';
+    } catch (error) {
+      status.textContent = OneOfTwoAuth.errorMessage(
+        error, 'Unable to start your session from this link. Try signing in or request a new link.'
+      );
+    }
+    form.hidden = false;
+  });
+  </script>
+</body>
+</html>
