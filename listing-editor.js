@@ -175,7 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
         upsert: false
       });
       if (error) {
-        if (String(error.statusCode ?? error.status) !== '409') throw error;
+        const statusCode = String(error.statusCode ?? error.status);
+        const duplicate = statusCode === '409' ||
+          (statusCode === '400' && /already exists|duplicate/i.test(error.message));
+        if (!duplicate) throw error;
         // A previous upload can succeed before its response reaches this browser.
         const existing = await bucket.createSignedUrl(photoAttempt.path, 60);
         if (existing.error) throw error;
