@@ -87,7 +87,12 @@
     <button id="retrySessionButton" type="button" hidden>Check again</button>
     
 
-    <p>This will become your personal dashboard.</p>
+    <section id="drafts" hidden>
+      <h2>Your drafts</h2>
+      <p id="draftsStatus" role="status"></p>
+      <ul id="draftsList"></ul>
+      <p><a href="add-listing.html">Add Listing</a></p>
+    </section>
 
     <button id="logoutButton" type="button" disabled>Log out</button>
 
@@ -97,6 +102,7 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script defer src="auth.js"></script>
+<script defer src="listing-drafts.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const userEmail = document.getElementById('userEmail');
@@ -129,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       userEmail.textContent = 'You are logged in as: ' + data.session.user.email;
+      loadListingDrafts(data.session.user.id);
       logoutButton.disabled = false;
     } catch (error) {
       userEmail.textContent = OneOfTwoAuth.errorMessage(

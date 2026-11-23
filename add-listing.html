@@ -13,20 +13,9 @@
   <title>Add a Listing | OneOfTwo</title>
  
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  
-
-<script>
-
-  const supabaseClient = window.supabase.createClient(
-
-    "https://lnbrqcklgndbizlhkdef.supabase.co",
-
-    "sb_publishable_EzhbUdb-HgoZ6hYtuvLfgQ_sY2fvRXW"
-
-  );
-
-</script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script defer src="auth.js"></script>
+  <script defer src="listing-editor.js"></script>
   <style>
 
     * { box-sizing: border-box; }
@@ -254,6 +243,18 @@ input[type="file"]::file-selector-button {
 
     }
 
+    #preview img {
+      display: block;
+      max-width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    #preview img[hidden] { display: none; }
+    #previewDescription { white-space: pre-wrap; overflow-wrap: anywhere; }
+    button:disabled { opacity: 0.55; cursor: default; }
+
     .note {
 
       color: #627086;
@@ -307,11 +308,8 @@ input[type="file"]::file-selector-button {
       <p>Every missing half deserves a chance.</p>
       
 
-<p id="authStatus" class="note" role="status">
-
-  Checking sign-in status...
-
-</p>
+<p id="authStatus" class="note" role="status">Checking sign-in status…</p>
+      <p id="signInLink" hidden><a href="index.html#login">Log in to save or publish</a></p>
 
       <form id="listingForm">
 
@@ -410,7 +408,7 @@ input[type="file"]::file-selector-button {
 
   
 
-        <button type="submit">Preview listing</button>
+        <button type="submit" id="previewListingButton">Preview listing</button>
         
 
 <button type="button" id="saveDraftButton"
@@ -421,10 +419,6 @@ input[type="file"]::file-selector-button {
 
 </button>
 
-<p id="saveDraftStatus" class="note" role="status"></p> 
-      
-
-
 <button type="button" id="publishListingButton"
 
         style="margin-top: 12px;" disabled>
@@ -433,7 +427,9 @@ input[type="file"]::file-selector-button {
 
 </button>
 
-<p id="publishStatus" class="note" role="status"></p>
+<p id="listingStatus" class="note" role="status"></p>
+        <p id="listingResult" hidden><a id="listingResultLink"></a></p>
+        <p id="newListingLink" hidden><a href="add-listing.html">Add another listing</a></p>
       </form>
 
       <div id="preview" hidden>
@@ -441,28 +437,13 @@ input[type="file"]::file-selector-button {
         <h3>Your listing preview</h3>
 
         <p id="previewType"></p>
+        <p id="previewCategory"></p>
 
         <h4 id="previewTitle"></h4>
 
         <p id="previewDescription"></p>
-
-        <p class="note">
-
-          This is a preview only.
-
-          Your listing has not been published.
-
-        </p>
-
+        <img id="previewPhoto" alt="" hidden>
       </div>
-
-      <p class="note">
-
-        First version of the OneOfTwo listing form.
-
-        Database saving will be added later.
-
-      </p>
 
     </section>
 
@@ -474,343 +455,6 @@ input[type="file"]::file-selector-button {
 
   </main>
 
-  <script>
-
-    document.getElementById("listingForm")
-
-      .addEventListener("submit", function(event) {
-
-        event.preventDefault();
-
-        const type = document.querySelector(
-
-          'input[name="type"]:checked'
-
-        ).value;
-
-        const title = document.getElementById(
-
-          "itemTitle"
-
-        ).value;
-
-        const description = document.getElementById(
-
-          "itemDescription"
-
-        ).value;
-
-        document.getElementById("previewType")
-
-          .textContent = type === "available"
-
-          ? "I HAVE"
-
-          : "I'M LOOKING FOR";
-
-        document.getElementById("previewTitle")
-
-          .textContent = title;
-
-        document.getElementById("previewDescription")
-
-          .textContent = description;
-
-        document.getElementById("preview").hidden = false;
-
-      });
-
-  </script>
- 
-
-<script>
-
-  document.addEventListener("DOMContentLoaded", async () => {
-
-    const status = document.getElementById("authStatus");
-
-    try {
-
-      const { data: { user }, error } =
-
-        await supabaseClient.auth.getUser();
-
-      if (error || !user) {
-
-        status.textContent =
-
-          "Please sign in to save a listing.";
-
-      } else {
-
-        status.textContent =
-
-          "You are signed in.";
-        
-
-document.getElementById("saveDraftButton").disabled = false; 
-  
-
-document.getElementById("publishListingButton").disabled = false;
-
-      }
-
-    } catch (error) {
-
-      status.textContent =
-
-        "Unable to check sign-in status.";
-
-    }
-
-  });
-
-</script>
-  
-
-<script>
-
-  document.addEventListener("DOMContentLoaded", () => {
-
-    const button = document.getElementById("saveDraftButton");
-
-    const status = document.getElementById("saveDraftStatus");
-
-    button.addEventListener("click", async () => {
-
-      const title = document.getElementById("itemTitle").value.trim();
-
-      const description = document.getElementById("itemDescription").value.trim();
-
-      const listingType = document.querySelector(
-
-        'input[name="type"]:checked'
-
-      ).value;
-
-      if (!title) {
-
-        status.textContent = "Please enter an item name.";
-
-        return;
-
-      } 
-      
-
-if (!document.getElementById("itemCategory").value) {
-
-  status.textContent = "Please select a category.";
-
-  return;
-
-}
-
-      button.disabled = true;
-
-      status.textContent = "Saving your draft...";
-
-      try {
-
-        const { data: { user }, error: authError } =
-
-          await supabaseClient.auth.getUser();
-
-        if (authError || !user) {
-
-          throw new Error("Please sign in first.");
-
-        }
-
-        const { error } = await supabaseClient
-
-          .from("listings")
-
-          .insert({
-
-            user_id: user.id,
-
-            title: title, 
-            
-
-
-category: document.getElementById("itemCategory").value,
-            
-
-            description: description,
-
-            listing_type: listingType,
-
-            publication_status: "draft"
-
-          });
-
-        if (error) throw error;
-
-        status.textContent = "Draft saved successfully!";
-
-      } catch (error) {
-
-        status.textContent = "Save failed: " + error.message;
-
-      } finally {
-
-        button.disabled = false;
-
-      }
-
-    });
-
-  });
-
-</script> 
-  
-
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const button = document.getElementById("publishListingButton");
-
-  const status = document.getElementById("publishStatus");
-
-  button.addEventListener("click", async () => {
-
-    const title = document.getElementById("itemTitle").value.trim();
-
-    const description = document.getElementById("itemDescription").value.trim();
-
-    const category = document.getElementById("itemCategory").value;
-
-    const listingType = document.querySelector(
-
-      'input[name="type"]:checked'
-
-    ).value;
-
-    if (!title) {
-
-      status.textContent = "Please enter an item name.";
-
-      return;
-
-    }
-
-    if (!category) {
-
-      status.textContent = "Please select a category.";
-
-      return;
-
-    }
-
-    if (!confirm("Publish this listing for everyone to see?")) {
-
-      return;
-
-    }
-
-    button.disabled = true;
-
-    status.textContent = "Publishing your listing...";
-
-    try {
-
-      const { data: { user }, error: authError } =
-
-        await supabaseClient.auth.getUser();
-
-      if (authError || !user) {
-
-        throw new Error("Please sign in first.");
-
-      }
- 
-
-let imageUrl = null;
-
-const imageFile = document.getElementById("itemImage").files[0];
-
-if (imageFile) {
-
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
-  if (!allowedTypes.includes(imageFile.type)) {
-
-    throw new Error("Please select a JPG, PNG or WebP image.");
-
-  }
-
-  if (imageFile.size > 10 * 1024 * 1024) {
-
-    throw new Error("Image must be smaller than 10 MB.");
-
-  }
-
-  const extension = imageFile.type.split("/")[1].replace("jpeg", "jpg");
-
-  const filePath = `${user.id}/${crypto.randomUUID()}.${extension}`;
-
-  const { error: uploadError } = await supabaseClient.storage
-
-    .from("listing-images")
-
-    .upload(filePath, imageFile, {
-
-      contentType: imageFile.type,
-
-      upsert: false
-
-    });
-
-  if (uploadError) throw uploadError;
-
-  const { data: urlData } = supabaseClient.storage
-
-    .from("listing-images")
-
-    .getPublicUrl(filePath);
-
-  imageUrl = urlData.publicUrl;
-
-}
-      const { error } = await supabaseClient
-
-        .from("listings")
-
-        .insert({
-
-          user_id: user.id,
-
-          title: title,
-
-          description: description,
-
-          category: category,
-
-          listing_type: listingType, 
-          image_url: imageUrl,
-
-          publication_status: "published"
-
-        });
-
-      if (error) throw error;
-
-      status.textContent = "Listing published successfully!";
-
-    } catch (error) {
-
-      status.textContent = "Publishing failed: " + error.message;
-
-      button.disabled = false;
-
-    }
-
-  });
-
-});
-
-</script>
 </body>
 
 </html>

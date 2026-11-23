@@ -133,6 +133,24 @@
 
     }
 
+    .listing {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .listing:hover h3 { text-decoration: underline; }
+
+    .listing img {
+      display: block;
+      width: 100%;
+      max-width: 360px;
+      height: auto;
+      margin-top: 12px;
+      border-radius: 10px;
+    }
+
     .listing h3 { margin-bottom: 10px; }
 
     .listing p { color: #cbd5e1; }
@@ -148,16 +166,6 @@
       border-radius: 20px;
 
       font-size: 12px;
-
-    }
-
-    .demo {
-
-      color: #fbbf24;
-
-      font-size: 12px;
-
-      margin-top: 15px;
 
     }
 
@@ -270,7 +278,7 @@
 
       </aside>
 
-      <section class="items" id="itemsContainer">
+      <section class="items" id="itemsContainer" aria-live="polite">
 
       </section>
 
@@ -278,246 +286,80 @@
 
   </main>
 
+  <script src="auth.js"></script>
+  <script src="listings-data.js"></script>
   <script>
-
-    
-
-const listingsSupabase = window.supabase.createClient(
-
-  "https://lnbrqcklgndbizlhkdef.supabase.co",
-
-  "sb_publishable_EzhbUdb-HgoZ6hYtuvLfgQ_sY2fvRXW"
-
-);
-
-
-
-const categories = {
-
-  fashion: "Fashion & Shoes",
-
-  jewellery: "Jewellery & Watches",
-
-  home: "Home & Living",
-
-  automotive: "Automotive", 
-
-  sports: "Sports & Outdoors",
-
-  electronics: "Electronics",
-
-  tools: "Tools & Hardware",
-
-  toys: "Toys & Games",
-
-  collectibles: "Collectibles & Sets",
-
-  lost: "Lost & Found",
-
-  parts: "Missing Parts"
-
-};
-
-    const demoListings = [
-
-      {
-  id: "shoe",
-        category: "fashion",
-
-        title: "Single left sneaker",
-
-        description: "Looking for the matching right shoe.",
-
-        status: "Wanted"
-
-      },
-
-      {
-     id: "glove",
-        category: "fashion",
-
-        title: "One black leather glove",
-
-        description: "One glove available. Looking for its match.",
-
-        status: "Available"
-
-      }
-
-    ];
-
-    const params = new URLSearchParams(window.location.search);
-
-    const requestedCategory = params.get("category") || "fashion";
-
-    const category = categories[requestedCategory]
-
-      ? requestedCategory
-
-      : "fashion";
-
-    document.getElementById("categoryTitle").textContent =
-
-      categories[category];
-
+    const { categoryName, fields, imageUrls, typeLabel } = OneOfTwoListings;
+    const requestedCategory = new URLSearchParams(location.search).get("category");
+    const category = categoryName(requestedCategory) ? requestedCategory : "fashion";
     const container = document.getElementById("itemsContainer");
 
+    document.getElementById("categoryTitle").textContent = categoryName(category);
     document.querySelectorAll(".sidebar a").forEach(link => {
-
-      if (link.getAttribute("href").endsWith("category=" + category)) {
-
+      if (link.getAttribute("href") === "listings.html?category=" + category) {
         link.classList.add("active");
-
+        link.setAttribute("aria-current", "page");
       }
-
     });
 
-    const matchingItems = demoListings.filter(
-
-      item => item.category === category
-
-    );
-
-    if (matchingItems.length === 0) {
-
-      container.textContent =
-
-        "No listings yet. New items will appear here soon.";
-
-    } else {
-
-      matchingItems.forEach(item => {
-
-        const card = document.createElement("a");
-
-        card.className = "listing";
-        card.href = "listing.html?id=" + encodeURIComponent(item.id);
-
-card.style.cssText = "display:block; color:inherit; text-decoration:none;";
-
-        const badge = document.createElement("span");
-
-        badge.className = "badge";
-
-        badge.textContent = item.status;
-
-        const title = document.createElement("h3");
-
-        title.textContent = item.title;
-
-        const description = document.createElement("p");
-
-        description.textContent = item.description;
-
-        const demo = document.createElement("p");
-
-        demo.className = "demo";
-
-        demo.textContent = "DEMO LISTING";
-
-        card.append(badge, title, description, demo);
-
-        container.appendChild(card);
-
-      });
-
-    } 
-    
-
-async function loadPublishedListings() {
-
-  container.textContent = "Loading listings...";
-
-  const { data, error } = await listingsSupabase
-
-    .from("listings")
-
-    .select("id, title, description, listing_type, category, image_url")
-
-    .eq("publication_status", "published")
-
-    .eq("category", category)
-
-    .order("created_at", { ascending: false });
-
-  if (error) {
-
-    console.error(error);
-
-    container.textContent = "Unable to load listings.";
-
-    return;
-
-  }
-
-  container.replaceChildren();
-
-  if (!data || data.length === 0) {
-
-    container.textContent = "No published listings yet.";
-
-    return;
-
-  }
-
-  data.forEach(item => {
-
-    const card = document.createElement("article");
-
-    card.className = "listing";
-
-    const badge = document.createElement("span");
-
-    badge.className = "badge";
-
-    badge.textContent =
-
-      item.listing_type === "wanted" ? "Wanted" : "Available";
-
-    const title = document.createElement("h3");
-
-    title.textContent = item.title;
-
-    const description = document.createElement("p");
-
-    description.textContent = item.description || "";
-
-    card.append(badge, title, description);
- 
-
-if (item.image_url) {
-
-  const photo = document.createElement("img");
-
-  photo.src = item.image_url;
-
-  photo.alt = item.title || "Listing photo";
-
-  photo.loading = "lazy";
-
-  photo.style.width = "100%";
-
-  photo.style.maxWidth = "360px";
-
-  photo.style.height = "auto";
-
-  photo.style.display = "block";
-
-  photo.style.marginTop = "12px";
-
-  photo.style.borderRadius = "10px";
-
-  card.appendChild(photo);
-
-}
-    container.appendChild(card);
-
-  });
-
-}
-
-loadPublishedListings();
-
+    function createListingCard(item) {
+      const card = document.createElement("a");
+      card.className = "listing";
+      card.href = "listing.html?id=" + encodeURIComponent(item.id);
+
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = typeLabel(item.listing_type);
+
+      const title = document.createElement("h3");
+      title.textContent = item.title;
+
+      const description = document.createElement("p");
+      description.textContent = item.description || "";
+
+      card.append(badge, title, description);
+      return card;
+    }
+
+    function addPhoto(card, item, url) {
+      if (!url) return;
+      const photo = document.createElement("img");
+      photo.alt = item.title || "Listing photo";
+      photo.loading = "lazy";
+      photo.referrerPolicy = "no-referrer";
+      photo.addEventListener("error", () => photo.remove(), { once: true });
+      photo.src = url;
+      card.appendChild(photo);
+    }
+
+    async function loadPublishedListings() {
+      container.textContent = "Loading listings...";
+      try {
+        const client = OneOfTwoAuth.getClient();
+        const { data, error } = await client
+          .from("listings")
+          .select(fields)
+          .eq("publication_status", "published")
+          .eq("category", category)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        if (!data.length) {
+          container.textContent = "No published listings yet.";
+          return;
+        }
+
+        const cards = data.map(createListingCard);
+        container.replaceChildren(...cards);
+        const urls = await imageUrls(client, data);
+        data.forEach((item, index) => addPhoto(cards[index], item, urls.get(item.id)));
+      } catch (error) {
+        console.error("Unable to load published listings.", error);
+        container.textContent = "Unable to load listings. Please try again.";
+      }
+    }
+
+    loadPublishedListings();
   </script>
 
 </body>
