@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let editorUserId;
   let loading = Boolean(request);
   let saving = false;
+  let writesEnabled = false;
   let published = false;
   let savedRow;
   let localPhotoUrl;
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateControls() {
     editorFields.forEach(field => { field.disabled = loading || saving || published; });
     previewButton.disabled = loading || saving || published;
-    draftButton.disabled = loading || saving || published || !editorUserId;
+    draftButton.disabled = loading || saving || published || !editorUserId || !writesEnabled;
     publishButton.disabled = draftButton.disabled;
   }
 
@@ -124,10 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       editorUserId = user.id;
       authStatus.textContent = 'You are signed in.';
-      if (!requestId) {
-        requestId = crypto.randomUUID();
-        return;
+      if (!requestId) requestId = crypto.randomUUID();
+      try {
+        const readiness = await client.rpc('oneoftwo_listing_writes_enabled');
+        if (readiness.error) throw readiness.error;
+        writesEnabled = readiness.data === true;
+      } catch (error) {
+        console.warn('Unable to check listing write availability:', error);
       }
+      if (!writesEnabled) {
+        status.textContent = 'Saving and publishing are temporarily paused. You can still preview changes.';
+      }
+      if (!request) return;
       if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(requestId)) {
         throw new Error('Invalid draft link');
       }
@@ -202,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function save(publicationStatus) {
-    if (saving || published || !editorUserId) return;
+    if (saving || published || !editorUserId || !writesEnabled) return;
     status.textContent = '';
     const values = readForm();
     if (!values) return;

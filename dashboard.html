@@ -135,8 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       userEmail.textContent = 'You are logged in as: ' + data.session.user.email;
-      loadListingDrafts(data.session.user.id);
       logoutButton.disabled = false;
+      if (typeof loadListingDrafts === 'function') {
+        loadListingDrafts(data.session.user.id);
+      }
     } catch (error) {
       userEmail.textContent = OneOfTwoAuth.errorMessage(
         error, 'Unable to check your session. Please try again.'

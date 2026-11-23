@@ -1,26 +1,21 @@
-# Ogłoszenia ze zdjęciami w OneOfTwo-Staging
+# OneOfTwo: wdrożenie ogłoszeń i zdjęć
 
-## 1. Przygotuj bazę testową
+## Bramka przed produkcją
 
-1. Zaloguj się do panelu Supabase i otwórz projekt **OneOfTwo-Staging**.
-2. Wybierz **SQL Editor → New query**. Wklej cały plik [listings.sql](listings.sql) i kliknij **Run**.
-3. Po udanym wykonaniu w **Table Editor** będzie widoczna tabela `listings`, a w **Storage** prywatny bucket `listing-images`. Jeśli edytor pokaże błąd, zapisz jego treść. Skrypt działa w transakcji.
+1. Uruchom wyłącznie [odczytową kontrolę schematu](listings-preflight.sql). Jeśli tabela istnieje i jest zgodna, uruchom także [odczytową kontrolę ogłoszeń i zdjęć](listings-preflight-data.sql). Zapisz wyniki. Zapytania zwracają metadane i liczniki. Nie zwracają nazw użytkowników, tytułów ani adresów zdjęć. Przejrzyj definicje polityk przed ich udostępnieniem.
+2. Porównaj kolumny, typy i ograniczenia z kodem. Sprawdź role, istniejące polityki restrykcyjne, triggery, zależne widoki i dodatkowe punkty dostępu, np. funkcje SQL udostępnione przez API. Wstrzymaj wdrożenie w razie nieznanego schematu, niezmapowanych zdjęć, publicznych zdjęć szkiców, niezgodnych grantów albo obiektów używanych poza OneOfTwo.
+3. Zapisz SHA aktualnego wdrożenia GitHub Pages i utwórz znacznik lub gałąź wskazującą tę wersję. W Supabase potwierdź punkt odzyskiwania lub przygotuj eksport bazy, w tym `listings`, schemat, polityki i konfigurację bucketa. Pobierz osobno pliki z `listing-images` za pomocą bezpiecznego narzędzia administracyjnego Storage. Zachowaj nazwy obiektów, liczbę, rozmiary i sumy kontrolne. Porównaj kopię z inwentarzem oraz sprawdź, czy można otworzyć próbkę. Kopia bazy obejmuje metadane Storage, a pliki wymagają osobnej kopii. [Kopie zapasowe Supabase](https://supabase.com/docs/guides/platform/backups).
+4. Ustal okno prac i chwilowo wstrzymaj aplikacyjne lub administracyjne procesy zapisu omijające RLS. Przygotuj dostęp do logów Pages, Auth, PostgREST i Storage. Przed każdym krokiem produkcyjnym wymagana jest osobna zgoda.
 
-Skrypt obsługuje świeżą bazę i istniejący zgodny schemat. Zachowuje typ i wartości w kolumnie `id`. Wymagane dotychczasowe pola to `id`, `user_id`, `title`, `description`, `category`, `listing_type`, `publication_status` i `created_at`. Dodaje brakujące kolumny obrazu i identyfikator używany do ponawiania zapisu. Bucket przyjmuje JPG, PNG i WebP do 10 MiB.
+## Kolejność publikacji
 
-## 2. Otwórz lokalną wersję
+1. **Przygotowanie i pauza zapisu.** Uruchom [listings.sql](listings.sql). Dodaje kolumny, przygotowuje RLS, wstrzymuje zapis ogłoszeń i plików dla ról przeglądarkowych. Widoczność istniejącego bucketa pozostaje taka sama. Stara strona nadal czyta opublikowane ogłoszenia i dotychczasowe publiczne zdjęcia. Sprawdź, czy nowe kolumny i funkcja są widoczne przez API przed publikacją kodu. Jeżeli wystąpi błąd skryptu, transakcja zostanie wycofana. Nie przechodź dalej.
+2. **Kod przed zmianą bucketa.** Dopiero po przygotowaniu schematu opublikuj PR i poczekaj na sukces GitHub Pages. W nowym oknie gościa sprawdź stronę główną, kategorie i szczegóły istniejących zdjęć. Sprawdź komunikat o pauzie w zalogowanym edytorze, logowanie i wylogowanie. Dokumenty i szkice pozostają do odczytu zgodnie z RLS.
+3. **Zmiana widoczności i kontrola.** W [listings-privatize.sql](listings-privatize.sql) wpisz zweryfikowany Project URL środowiska jako `asset_origin`. Skrypt mapuje tylko stare publiczne adresy należące do tego hosta i odpowiadające istniejącym plikom właściciela. Przerywa transakcję, jeśli wykryje niezgodność. Ustawia bucket jako prywatny i utrzymuje blokadę zapisów. Otwórz świeże okno InPrivate i sprawdź najpierw istniejące opublikowane ogłoszenie ze zdjęciem w kategorii i szczegółach. Sprawdź, czy gość nadal nie widzi szkiców. Jeśli przeglądarka ma otwartą starą stronę, odśwież ją. Publiczne adresy, które były udostępniane poza aplikacją, mogą przestać działać. Kopie już pobranych albo skeszowanych zdjęć nie znikają wskutek zmiany prywatności. [Dostęp do bucketa](https://supabase.com/docs/guides/storage/buckets/fundamentals).
+4. **Otwarcie edytora.** Po udanej kontroli uruchom [listings-enable-writes.sql](listings-enable-writes.sql). Odśwież edytor i sprawdź, czy zapis jest dostępny. Bez osobnej zgody nie twórz produkcyjnych ogłoszeń testowych. Sprawdź ponownie istniejące zdjęcia, brak dostępu do szkiców dla gościa i logi błędów. Cały test zapisu i wysyłania zdjęcia wykonano już na Staging dla poprzedniego commitu PR. Zmiany kolejności przećwicz osobno na kopii z reprezentatywnymi starszymi zdjęciami.
 
-Rozpakuj pakiet OneOfTwo-Staging dla Windows i uruchom `Uruchom OneOfTwo-Staging.cmd`. Potrzebny jest Node.js. W oknie programu wklej **Project URL** projektu OneOfTwo-Staging i jego publiczny klucz **Publishable** lub **anon**. Następnie otwórz w przeglądarce `http://localhost:8080`. Program odrzuca znany adres projektu produkcyjnego i klucze tajne. Adres i klucz publiczny wprowadza się przy uruchamianiu. SMTP pozostaje w panelu Supabase.
+## Wstrzymanie lub wycofanie
 
-## 3. Sprawdź ogłoszenie i zdjęcie
-
-1. Zaloguj się kontem testowym. Kliknij **Add Listing**, wybierz typ i kategorię, wpisz nazwę i opis, a następnie dodaj plik JPG, PNG lub WebP.
-2. Kliknij **Preview listing** i sprawdź zdjęcie. Zapisz **Save as draft** i wróć do szkicu przez **Your drafts** w panelu.
-3. Przed publikacją sprawdź w osobnym oknie prywatnym, że szkicu nie widać na liście kategorii. Drugie konto testowe nie powinno mieć dostępu do cudzego szkicu.
-4. Wróć do swojego szkicu, wybierz **Publish listing** i otwórz odpowiednią kategorię w oknie prywatnym. Sprawdź, czy karta pokazuje nazwę, typ i zdjęcie oraz czy otwiera szczegóły. Szkic powinien zniknąć z **Your drafts**.
-
-## Dane i dostęp
-
-Nowe zdjęcia są przechowywane pod ścieżką właściciela w prywatnym buckecie. Zapis i usuwanie ogłoszeń ograniczają polityki RLS. Szkice i nieopublikowane zdjęcia są dostępne właścicielowi. Gość może odczytać opublikowane ogłoszenie i uzyskać czasowy adres zdjęcia. Adres podpisany działa do upływu jego ważności. Przeglądarka usuwa zastąpione zdjęcia po potwierdzonym zapisie, jeśli żadne ogłoszenie ich nie używa. Przerwanie procesu po przesłaniu pliku może pozostawić nieużywany plik prywatny.
-
-Przed ewentualnym wdrożeniem produkcyjnym sprawdź istniejący schemat, polityki i pliki oraz przygotuj kopię zapasową. Starsze adresy z bucketa `listing-images` są mapowane na ścieżki, jeśli pasują do właściciela i istniejącego obiektu. Skrypt przerywa zmianę publicznego bucketa na prywatny, gdy któregoś takiego adresu nie da się zmapować. Zmiana prywatności istniejącego bucketa wymaga skoordynowania z udostępnieniem nowej wersji odczytującej adresy podpisane.
+- Gdy potrzebna jest korekta po przygotowaniu schematu, wstrzymaj kroki i zachowaj kopię inwentarza oraz logów. Jeśli bucket jest wciąż publiczny, publiczny odczyt w wersji sprzed PR pozostaje zgodny. Wznów stary zapis dopiero według zatwierdzonego planu odtworzenia poprzednich polityk, po weryfikacji stanu bazy.
+- Po zmianie widoczności pozostaw bucket prywatny. Przy problemie wstrzymaj zapisy poleceniem `update public.oneoftwo_listing_rollout set writes_enabled = false where singleton;` po osobnej zgodzie. Pozostaw nowe kolumny oraz odczyt adresów podpisanych i wydaj poprawkę kodu. Pełny powrót do starego kodu po przełączeniu ukryłby część zdjęć. Otwarcie bucketa mogłoby ujawnić pliki szkiców.
+- Odtworzenie bazy i plików z kopii zostaw na sytuację, w której odzyskanie przez naprawę kodu lub konfiguracji nie jest możliwe. Przed odtworzeniem uzgodnij sposób zachowania zapisów powstałych po wykonaniu kopii. Przywrócenie metadanych bazy nie przywraca plików Storage.

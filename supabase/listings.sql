@@ -1,7 +1,7 @@
--- Run this in the SQL Editor of OneOfTwo-Staging first.
--- The transaction aborts if a legacy public listing-images link cannot be mapped.
--- Back up and review production separately before a coordinated release.
+-- Phase 1: prepare schema and pause writes. Leave the bucket visibility unchanged.
+-- Review the read-only preflight and take backups before any production use.
 begin;
+set local lock_timeout = '5s';
 
 create table if not exists public.listings (
   id uuid primary key default gen_random_uuid(),
@@ -53,29 +53,27 @@ create index if not exists oneoftwo_listings_category_idx
 create index if not exists oneoftwo_listings_image_idx
   on public.listings (image_path) where image_path is not null;
 
--- Translate URLs from the old upload code only when the exact object exists
--- and its path has the original owner's UUID as its only directory.
-update public.listings as l
-set image_path = o.name
-from storage.objects as o
-where l.image_path is null
-  and o.bucket_id = 'listing-images'
-  and o.name = substring(l.image_url from '^https://[^/?#]+/storage/v1/object/public/listing-images/([^?#]+)$')
-  and o.name ~ ('^' || l.user_id::text || '/[0-9a-f-]{36}[.](jpg|png|webp)$');
-
+-- Stop when the live schema could contain fields not intended for public access.
 do $$
 begin
-  if exists (select 1 from storage.buckets where id = 'listing-images' and public)
-    and exists (
-      select 1 from public.listings as l
-      where l.image_url ~ '^https://[^/?#]+/storage/v1/object/public/listing-images/'
-        and not exists (
-          select 1 from storage.objects as o
-          where o.bucket_id = 'listing-images' and o.name = l.image_path
-            and o.name = substring(l.image_url from '^https://[^/?#]+/storage/v1/object/public/listing-images/([^?#]+)$')
-        )
-    ) then
-    raise exception 'Existing public listing-images URLs could not all be mapped. Inspect the legacy objects before making the bucket private.';
+  if exists (
+    select column_name
+    from information_schema.columns
+    where table_schema = 'public' and table_name = 'listings'
+      and column_name not in (
+        'id', 'user_id', 'title', 'description', 'category', 'listing_type',
+        'publication_status', 'created_at', 'image_url', 'image_path', 'client_request_id'
+      )
+  ) then
+    raise exception 'Additional listings columns require a grants and schema review before deployment.';
+  end if;
+  if exists (
+    select 1 from public.listings as l
+    where l.user_id is null
+      or not exists (select 1 from auth.users as u where u.id = l.user_id)
+      or l.publication_status is null or l.publication_status not in ('draft', 'published')
+  ) then
+    raise exception 'Existing listings have unexpected owners or status. Review without changing the data.';
   end if;
 end
 $$;
@@ -88,13 +86,38 @@ alter table public.listings add constraint oneoftwo_listings_image_path_owner ch
 ) not valid;
 alter table public.listings validate constraint oneoftwo_listings_image_path_owner;
 
--- Supabase supports SQL for bucket creation. Manage actual objects via Storage API.
+-- Fresh installations begin private. For existing buckets, keep the old
+-- public URLs working until the new reader is deployed.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('listing-images', 'listing-images', false, 10485760, array['image/jpeg', 'image/png', 'image/webp'])
-on conflict (id) do update set
-  public = excluded.public,
-  file_size_limit = excluded.file_size_limit,
-  allowed_mime_types = excluded.allowed_mime_types;
+on conflict (id) do nothing;
+
+create table if not exists public.oneoftwo_listing_rollout (
+  singleton boolean primary key default true check (singleton),
+  cutover_complete boolean not null default false,
+  writes_enabled boolean not null default false
+);
+alter table public.oneoftwo_listing_rollout enable row level security;
+revoke all on public.oneoftwo_listing_rollout from public, anon, authenticated;
+insert into public.oneoftwo_listing_rollout (singleton, writes_enabled)
+values (true, false)
+on conflict (singleton) do update set writes_enabled = false, cutover_complete = false;
+
+create or replace function public.oneoftwo_listing_writes_enabled()
+returns boolean
+language sql
+stable security definer
+set search_path = ''
+as $$
+  select coalesce((
+    select r.writes_enabled and r.cutover_complete and not b.public
+    from public.oneoftwo_listing_rollout as r
+    cross join storage.buckets as b
+    where r.singleton and b.id = 'listing-images'
+  ), false);
+$$;
+revoke all on function public.oneoftwo_listing_writes_enabled() from public;
+grant execute on function public.oneoftwo_listing_writes_enabled() to anon, authenticated;
 
 alter table public.listings enable row level security;
 revoke insert, update, delete, truncate on public.listings from public, anon;
@@ -129,13 +152,22 @@ create policy oneoftwo_listings_write on public.listings
   using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
 create policy oneoftwo_listings_insert_guard on public.listings as restrictive
   for insert to anon, authenticated
-  with check (user_id = (select auth.uid()));
+  with check (
+    user_id = (select auth.uid()) and (select public.oneoftwo_listing_writes_enabled())
+    and (image_url is null or image_path is not null
+      or image_url !~ '/storage/v1/(object|render/image)/public/listing-images/')
+  );
 create policy oneoftwo_listings_update_guard on public.listings as restrictive
   for update to anon, authenticated
-  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+  using (user_id = (select auth.uid()) and (select public.oneoftwo_listing_writes_enabled()))
+  with check (
+    user_id = (select auth.uid()) and (select public.oneoftwo_listing_writes_enabled())
+    and (image_url is null or image_path is not null
+      or image_url !~ '/storage/v1/(object|render/image)/public/listing-images/')
+  );
 create policy oneoftwo_listings_delete_guard on public.listings as restrictive
   for delete to anon, authenticated
-  using (user_id = (select auth.uid()));
+  using (user_id = (select auth.uid()) and (select public.oneoftwo_listing_writes_enabled()));
 
 -- Other buckets keep their existing access rules. These guards apply even
 -- if another permissive policy already exists on storage.objects.
@@ -166,7 +198,10 @@ create policy oneoftwo_listing_images_insert_guard on storage.objects as restric
   for insert to anon, authenticated
   with check (
     bucket_id <> 'listing-images'
-    or name ~ ('^' || (select auth.uid())::text || '/[0-9a-f-]{36}[.](jpg|png|webp)$')
+    or (
+      (select public.oneoftwo_listing_writes_enabled())
+      and name ~ ('^' || (select auth.uid())::text || '/[0-9a-f-]{36}[.](jpg|png|webp)$')
+    )
   );
 
 create policy oneoftwo_listing_images_update_guard on storage.objects as restrictive
@@ -180,7 +215,8 @@ create policy oneoftwo_listing_images_delete_guard on storage.objects as restric
   using (
     bucket_id <> 'listing-images'
     or (
-      split_part(name, '/', 1) = (select auth.uid())::text
+      (select public.oneoftwo_listing_writes_enabled())
+      and split_part(name, '/', 1) = (select auth.uid())::text
       and not exists (
         select 1 from public.listings as l where l.image_path = storage.objects.name
       )
@@ -198,4 +234,5 @@ create policy oneoftwo_listing_bucket_update_guard on storage.buckets as restric
 create policy oneoftwo_listing_bucket_delete_guard on storage.buckets as restrictive
   for delete to anon, authenticated using (id <> 'listing-images');
 
+notify pgrst, 'reload schema';
 commit;
