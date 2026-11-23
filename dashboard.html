@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       userEmail.textContent = 'You are logged in as: ' + data.session.user.email;
       logoutButton.disabled = false;
       if (typeof loadListingDrafts === 'function') {
-        loadListingDrafts(data.session.user.id);
+        loadListingDrafts();
       }
     } catch (error) {
       userEmail.textContent = OneOfTwoAuth.errorMessage(

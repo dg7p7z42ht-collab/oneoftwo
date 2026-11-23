@@ -1,4 +1,4 @@
-async function loadListingDrafts(userId) {
+async function loadListingDrafts() {
   const section = document.getElementById('drafts');
   const list = document.getElementById('draftsList');
   const status = document.getElementById('draftsStatus');
@@ -8,11 +8,7 @@ async function loadListingDrafts(userId) {
 
   try {
     const { data, error } = await OneOfTwoAuth.getClient()
-      .from('listings')
-      .select('client_request_id,title')
-      .eq('user_id', userId)
-      .eq('publication_status', 'draft')
-      .order('created_at', { ascending: false });
+      .rpc('oneoftwo_listing_drafts');
     if (error) throw error;
 
     status.textContent = data.length ? '' : 'You have no drafts yet.';

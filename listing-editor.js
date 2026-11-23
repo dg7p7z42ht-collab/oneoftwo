@@ -89,8 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function findListing(client) {
-    return client.from('listings').select(rowFields)
-      .eq('client_request_id', requestId).eq('user_id', editorUserId).maybeSingle();
+    return client.rpc('oneoftwo_listing_for_edit', { request_id: requestId }).maybeSingle();
   }
 
   async function loadSavedPhoto(client, row) {
@@ -252,8 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       const table = client.from('listings');
       const write = previous
-        ? table.update(payload).eq('client_request_id', requestId)
-          .eq('user_id', editorUserId).eq('publication_status', 'draft')
+        ? table.update(payload).eq('id', previous.id).eq('publication_status', 'draft')
         : table.insert({ ...payload, user_id: editorUserId, client_request_id: requestId });
       const response = await write.select(rowFields).maybeSingle();
       if (response.error) throw response.error;

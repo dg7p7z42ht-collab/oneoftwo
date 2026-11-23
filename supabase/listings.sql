@@ -19,23 +19,70 @@ alter table public.listings
   add column if not exists image_path text,
   add column if not exists client_request_id uuid;
 
--- Existing listing IDs are left alone, including bigint/identity IDs.
+-- Guard the types and defaults the editor relies on. Known legacy fields keep
+-- their existing types and values, but new inserts must be allowed to omit them.
 do $$
 begin
   if exists (
-    select required.name
-    from unnest(array[
-      'id', 'user_id', 'title', 'description', 'category', 'listing_type',
-      'publication_status', 'created_at'
-    ]) as required(name)
-    except
-    select column_name::text
-    from information_schema.columns
+    select 1
+    from (values
+      ('id', array['uuid','smallint','integer','bigint']),
+      ('user_id', array['uuid']),
+      ('title', array['text','character varying']),
+      ('description', array['text','character varying']),
+      ('category', array['text','character varying']),
+      ('listing_type', array['text','character varying']),
+      ('publication_status', array['text','character varying']),
+      ('created_at', array['timestamp with time zone']),
+      ('image_url', array['text','character varying']),
+      ('image_path', array['text','character varying']),
+      ('client_request_id', array['uuid'])
+    ) as expected(name, types)
+    left join information_schema.columns as c
+      on c.table_schema = 'public' and c.table_name = 'listings' and c.column_name = expected.name
+    where c.data_type is null or not (c.data_type = any(expected.types))
+      or c.is_generated <> 'NEVER'
+      or (c.column_name <> 'id' and c.is_identity = 'YES')
+  ) or not exists (
+    select 1
+    from pg_index as i
+    join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = i.indkey[0]
+    where i.indrelid = 'public.listings'::regclass and i.indisprimary
+      and i.indnkeyatts = 1 and a.attname = 'id'
+  ) or exists (
+    select 1 from information_schema.columns
     where table_schema = 'public' and table_name = 'listings'
-  ) or (select data_type from information_schema.columns
-        where table_schema = 'public' and table_name = 'listings' and column_name = 'user_id')
-       is distinct from 'uuid' then
-    raise exception 'Incompatible listings table. Review the columns from the existing OneOfTwo schema.';
+      and column_name in ('id', 'created_at')
+      and column_default is null and is_identity <> 'YES'
+  ) then
+    raise exception 'Incompatible listings column type, primary key or insert default. Review the schema.';
+  end if;
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'listings'
+      and column_name not in (
+        'id', 'user_id', 'title', 'description', 'category', 'listing_type',
+        'publication_status', 'created_at', 'image_url', 'image_path', 'client_request_id'
+      )
+      and (
+        column_name not in (
+          'location', 'item_have', 'item_wanted', 'brand', 'model', 'color', 'size',
+          'have_side', 'wanted_side'
+        )
+        or (is_nullable = 'NO' and column_default is null
+            and is_identity <> 'YES' and is_generated = 'NEVER')
+      )
+  ) then
+    raise exception 'Unknown or required legacy listings column. Review the insert contract and privacy.';
+  end if;
+  if exists (
+    select 1 from public.listings as l
+    where l.user_id is null
+      or not exists (select 1 from auth.users as u where u.id = l.user_id)
+      or l.listing_type is null or l.listing_type not in ('available', 'wanted')
+      or l.publication_status is null or l.publication_status not in ('draft', 'published')
+  ) then
+    raise exception 'Existing listings have unexpected owners, types or status. Review without changing the data.';
   end if;
 end
 $$;
@@ -52,31 +99,6 @@ create index if not exists oneoftwo_listings_category_idx
   on public.listings (category, created_at desc) where publication_status = 'published';
 create index if not exists oneoftwo_listings_image_idx
   on public.listings (image_path) where image_path is not null;
-
--- Stop when the live schema could contain fields not intended for public access.
-do $$
-begin
-  if exists (
-    select column_name
-    from information_schema.columns
-    where table_schema = 'public' and table_name = 'listings'
-      and column_name not in (
-        'id', 'user_id', 'title', 'description', 'category', 'listing_type',
-        'publication_status', 'created_at', 'image_url', 'image_path', 'client_request_id'
-      )
-  ) then
-    raise exception 'Additional listings columns require a grants and schema review before deployment.';
-  end if;
-  if exists (
-    select 1 from public.listings as l
-    where l.user_id is null
-      or not exists (select 1 from auth.users as u where u.id = l.user_id)
-      or l.publication_status is null or l.publication_status not in ('draft', 'published')
-  ) then
-    raise exception 'Existing listings have unexpected owners or status. Review without changing the data.';
-  end if;
-end
-$$;
 
 alter table public.listings drop constraint if exists oneoftwo_listings_image_path_owner;
 alter table public.listings add constraint oneoftwo_listings_image_path_owner check (
@@ -119,11 +141,123 @@ $$;
 revoke all on function public.oneoftwo_listing_writes_enabled() from public;
 grant execute on function public.oneoftwo_listing_writes_enabled() to anon, authenticated;
 
+-- RLS filters rows. Column permissions also protect legacy data and ownership
+-- metadata, including on published rows accessible to signed-in visitors.
 alter table public.listings enable row level security;
-revoke insert, update, delete, truncate on public.listings from public, anon;
-revoke truncate on public.listings from authenticated;
-grant select on public.listings to anon, authenticated;
-grant insert, update, delete on public.listings to authenticated;
+revoke all privileges on table public.listings from public, anon, authenticated;
+do $$
+declare
+  column_names text;
+begin
+  select string_agg(format('%I', column_name), ', ')
+  into column_names
+  from information_schema.columns
+  where table_schema = 'public' and table_name = 'listings';
+  execute format('revoke all privileges (%s) on table public.listings from public, anon, authenticated', column_names);
+end
+$$;
+grant select (id, title, description, category, listing_type, publication_status, created_at,
+              image_url, image_path) on public.listings to anon, authenticated;
+grant insert (user_id, client_request_id, title, description, category, listing_type,
+              publication_status, image_url, image_path) on public.listings to authenticated;
+grant update (title, description, category, listing_type, publication_status,
+              image_url, image_path) on public.listings to authenticated;
+grant delete on public.listings to authenticated;
+
+-- Expose only the signed-in owner's matching records without making ownership
+-- or request IDs queryable on the public table endpoint.
+create or replace function public.oneoftwo_listing_for_edit(request_id uuid)
+returns table (
+  id text, title text, description text, category text, listing_type text,
+  publication_status text, image_path text, image_url text
+)
+language sql
+stable security definer
+set search_path = ''
+as $$
+  select l.id::text, l.title::text, l.description::text, l.category::text, l.listing_type::text,
+         l.publication_status::text, l.image_path::text, l.image_url::text
+  from public.listings as l
+  where l.user_id = (select auth.uid()) and l.client_request_id = $1;
+$$;
+
+create or replace function public.oneoftwo_listing_drafts()
+returns table (client_request_id uuid, title text)
+language sql
+stable security definer
+set search_path = ''
+as $$
+  select l.client_request_id, l.title::text
+  from public.listings as l
+  where l.user_id = (select auth.uid()) and l.publication_status = 'draft'
+  order by l.created_at desc;
+$$;
+
+revoke all on function public.oneoftwo_listing_for_edit(uuid) from public, anon, authenticated;
+revoke all on function public.oneoftwo_listing_drafts() from public, anon, authenticated;
+grant execute on function public.oneoftwo_listing_for_edit(uuid) to authenticated;
+grant execute on function public.oneoftwo_listing_drafts() to authenticated;
+
+-- Abort on unexpected effective rights, including from inherited role grants.
+do $$
+declare
+  browser_role text;
+  privilege_name text;
+  listing_column text;
+  permitted boolean;
+  readable constant text[] := array[
+    'id', 'title', 'description', 'category', 'listing_type', 'publication_status',
+    'created_at', 'image_url', 'image_path'
+  ];
+  editable constant text[] := array[
+    'title', 'description', 'category', 'listing_type', 'publication_status', 'image_url', 'image_path'
+  ];
+begin
+  foreach browser_role in array array['anon', 'authenticated'] loop
+    if exists (select 1 from pg_roles where rolname = browser_role and (rolsuper or rolbypassrls))
+      or pg_has_role(browser_role, (
+        select pg_get_userbyid(relowner) from pg_class where oid = 'public.listings'::regclass
+      ), 'MEMBER') then
+      raise exception 'Unsafe role membership for %. Review grants before deployment.', browser_role;
+    end if;
+    foreach privilege_name in array array['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','TRIGGER','REFERENCES'] loop
+      permitted := browser_role = 'authenticated' and privilege_name = 'DELETE';
+      if has_table_privilege(browser_role, 'public.listings', privilege_name) is distinct from permitted then
+        raise exception 'Unexpected effective % privilege on listings for %. Review inherited grants.',
+          privilege_name, browser_role;
+      end if;
+    end loop;
+    if current_setting('server_version_num')::integer >= 170000 then
+      if has_table_privilege(browser_role, 'public.listings', 'MAINTAIN') then
+        raise exception 'Unexpected effective MAINTAIN privilege on listings for %.', browser_role;
+      end if;
+    end if;
+    for listing_column in
+      select column_name from information_schema.columns
+      where table_schema = 'public' and table_name = 'listings'
+    loop
+      foreach privilege_name in array array['SELECT','INSERT','UPDATE','REFERENCES'] loop
+        permitted := case privilege_name
+          when 'SELECT' then listing_column = any(readable)
+          when 'INSERT' then browser_role = 'authenticated'
+            and (listing_column = any(editable) or listing_column in ('user_id','client_request_id'))
+          when 'UPDATE' then browser_role = 'authenticated' and listing_column = any(editable)
+          else false
+        end;
+        if has_column_privilege(browser_role, 'public.listings', listing_column, privilege_name)
+           is distinct from permitted then
+          raise exception 'Unexpected effective % privilege on listings.% for %. Review inherited grants.',
+            privilege_name, listing_column, browser_role;
+        end if;
+      end loop;
+    end loop;
+  end loop;
+  if has_function_privilege('anon', 'public.oneoftwo_listing_for_edit(uuid)', 'EXECUTE')
+    or has_function_privilege('anon', 'public.oneoftwo_listing_drafts()', 'EXECUTE') then
+    raise exception 'Anonymous access to an owner-only listing function remains enabled.';
+  end if;
+end
+$$;
 
 do $$
 declare
