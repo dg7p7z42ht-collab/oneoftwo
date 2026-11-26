@@ -79,6 +79,7 @@
     h1 {
 
       font-size: 36px;
+      overflow-wrap: anywhere;
 
       margin-bottom: 15px;
 
@@ -102,12 +103,22 @@
 
       display: grid;
 
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
 
       gap: 24px;
 
       margin-top: 30px;
 
+    }
+
+    .layout[hidden] { display: none; }
+
+    .photo img {
+      display: block;
+      max-width: 100%;
+      max-height: 600px;
+      height: auto;
+      border-radius: 10px;
     }
 
     .panel {
@@ -167,20 +178,8 @@
     .description {
 
       line-height: 1.7;
-
-    }
-
-    .future {
-
-      margin-top: 24px;
-
-      padding: 18px;
-
-      background: #172554;
-
-      border-radius: 14px;
-
-      color: #bfdbfe;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
 
     }
 
@@ -188,7 +187,7 @@
 
       .layout {
 
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
 
       }
 
@@ -213,191 +212,144 @@
   </header>
 
   <main>
+    <a class="back" id="backLink" href="listings.html">← Back to categories</a>
 
-    <a class="back" id="backLink"
+    <h1 id="listingTitle" aria-live="polite">Loading listing...</h1>
+    <p id="listingMessage" role="status"></p>
 
-       href="listings.html?category=fashion">
-
-      ← Back to Fashion & Shoes
-
-    </a>
-
-    <h1 id="listingTitle">Loading listing...</h1>
-
-    <span class="badge" id="listingStatus"></span>
-
-    <p id="categoryName"></p>
-
-    <div class="layout">
-
+    <div class="layout" id="listingDetails" hidden>
       <section class="panel">
-
-        <div class="photo">
-
-          📷 Photo will appear here
-
-        </div>
-
-        <div class="future">
-
-          AI matching suggestions will appear here
-
-          in a future version of OneOfTwo.
-
-        </div>
-
+        <div class="photo" id="listingPhoto">No photo provided.</div>
       </section>
 
       <section class="panel">
-
+        <span class="badge" id="listingStatus"></span>
+        <p id="categoryName"></p>
         <h2>Item Details</h2>
-
-        <div class="field">
-
+        <div class="field" id="haveField" hidden>
           <strong>I have</strong>
-
           <span id="itemHave"></span>
-
         </div>
-
-        <div class="field">
-
+        <div class="field" id="wantedField" hidden>
           <strong>I am looking for</strong>
-
           <span id="itemWanted"></span>
-
         </div>
-
-        <div class="field">
-
-          <strong>Brand</strong>
-
-          <span id="itemBrand"></span>
-
-        </div>
-
-        <div class="field">
-
-          <strong>Model</strong>
-
-          <span id="itemModel"></span>
-
-        </div>
-
-        <div class="field">
-
-          <strong>Size</strong>
-
-          <span id="itemSize"></span>
-
-        </div>
-
         <h2>Description</h2>
-
         <p class="description" id="itemDescription"></p>
-
-        <p><strong>DEMO LISTING</strong></p>
-
+        <p id="demoLabel" hidden><strong>DEMO LISTING</strong></p>
       </section>
-
     </div>
-
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="auth.js"></script>
+  <script src="listings-data.js"></script>
   <script>
-
-    const demoListings = {
-
+    const { categoryName, fields, imageUrls, typeLabel } = OneOfTwoListings;
+    const demos = {
       shoe: {
-
         title: "Single left sneaker",
-
-        status: "Wanted",
-
-        category: "Fashion & Shoes",
-
+        listing_type: "wanted",
+        category: "fashion",
         have: "Left sneaker",
-
         wanted: "Matching right sneaker",
-
-        brand: "Not specified",
-
-        model: "Not specified",
-
-        size: "Not specified",
-
         description: "Looking for the matching right shoe."
-
       },
-
       glove: {
-
         title: "One black leather glove",
-
-        status: "Available",
-
-        category: "Fashion & Shoes",
-
+        listing_type: "available",
+        category: "fashion",
         have: "One black leather glove",
-
         wanted: "Matching glove",
-
-        brand: "Not specified",
-
-        model: "Not specified",
-
-        size: "Not specified",
-
         description: "One glove available. Looking for its match."
-
       }
-
     };
 
-    const params = new URLSearchParams(window.location.search);
+    function showListing(item, demo = false) {
+      document.title = item.title + " - OneOfTwo";
+      document.getElementById("listingTitle").textContent = item.title;
+      document.getElementById("listingStatus").textContent = typeLabel(item.listing_type);
+      document.getElementById("itemDescription").textContent = item.description || "No description provided.";
 
-    const listingId = params.get("id") || "shoe";
+      const categoryLabel = categoryName(item.category);
+      if (categoryLabel) {
+        document.getElementById("categoryName").textContent = categoryLabel;
+        const backLink = document.getElementById("backLink");
+        backLink.href = "listings.html?category=" + encodeURIComponent(item.category);
+        backLink.textContent = "← Back to " + categoryLabel;
+      }
 
-    const item = demoListings[listingId];
-
-    function showText(elementId, value) {
-
-      document.getElementById(elementId).textContent = value;
-
+      const have = demo ? item.have : (item.listing_type === "available" ? item.title : "");
+      const wanted = demo ? item.wanted : (item.listing_type === "wanted" ? item.title : "");
+      document.getElementById("itemHave").textContent = have;
+      document.getElementById("itemWanted").textContent = wanted;
+      document.getElementById("haveField").hidden = !have;
+      document.getElementById("wantedField").hidden = !wanted;
+      document.getElementById("demoLabel").hidden = !demo;
+      document.getElementById("listingDetails").hidden = false;
     }
 
-    if (item) {
+    async function showPhoto(client, item) {
+      if (!item.image_path && !item.image_url) return;
+      const container = document.getElementById("listingPhoto");
+      container.textContent = "Loading photo...";
+      const url = (await imageUrls(client, [item])).get(item.id);
+      if (!url) {
+        container.textContent = "Photo unavailable.";
+        return;
+      }
 
-      showText("listingTitle", item.title);
-
-      showText("listingStatus", item.status);
-
-      showText("categoryName", item.category);
-
-      showText("itemHave", item.have);
-
-      showText("itemWanted", item.wanted);
-
-      showText("itemBrand", item.brand);
-
-      showText("itemModel", item.model);
-
-      showText("itemSize", item.size);
-
-      showText("itemDescription", item.description);
-
-    } else {
-
-      showText("listingTitle", "Listing not found");
-
-      showText("listingStatus", "Unavailable");
-
-      showText("itemDescription",
-
-        "This listing does not exist.");
-
+      const photo = document.createElement("img");
+      photo.alt = item.title || "Listing photo";
+      photo.referrerPolicy = "no-referrer";
+      photo.addEventListener("error", () => {
+        container.textContent = "Photo unavailable.";
+      }, { once: true });
+      photo.src = url;
+      container.replaceChildren(photo);
     }
 
+    function showUnavailable(title, message) {
+      document.getElementById("listingTitle").textContent = title;
+      document.getElementById("listingMessage").textContent = message;
+    }
+
+    async function loadListing() {
+      const id = new URLSearchParams(location.search).get("id");
+      if (Object.hasOwn(demos, id)) {
+        showListing(demos[id], true);
+        return;
+      }
+
+      if (!id || !/^[a-z0-9_-]{1,128}$/i.test(id)) {
+        showUnavailable("Listing not found", "This listing does not exist or is no longer published.");
+        return;
+      }
+
+      try {
+        const client = OneOfTwoAuth.getClient();
+        const { data, error } = await client
+          .from("listings")
+          .select(fields)
+          .eq("id", id)
+          .eq("publication_status", "published")
+          .maybeSingle();
+
+        if (error && error.code !== "22P02") throw error;
+        if (!data) {
+          showUnavailable("Listing not found", "This listing does not exist or is no longer published.");
+          return;
+        }
+
+        showListing(data);
+        await showPhoto(client, data);
+      } catch (error) {
+        console.error("Unable to load listing details.", error);
+        showUnavailable("Unable to load listing", "Please try again.");
+      }
+    }
+
+    loadListing();
   </script>
 
 </body>
