@@ -74,6 +74,10 @@ nav a:hover{color:white}
 
 .listing{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:22px}
 
+#latestListingsGrid .listing{color:inherit;text-decoration:none;overflow-wrap:anywhere}
+#latestListingsGrid .listing:is(:hover,:focus-visible) h3{text-decoration:underline}
+#latestListingsGrid img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:12px}
+
 .badge{display:inline-block;background:#1d4ed8;padding:6px 10px;border-radius:999px;font-size:12px;margin-bottom:10px}
 
 form input,form textarea,form select,.auth-card input{width:100%;max-width:560px;padding:16px;border-radius:12px;border:none;margin:8px 0;font-size:16px}
@@ -183,7 +187,7 @@ nav a{display:inline-block;margin:8px 10px}
 
     <div class="stat"><strong id="categoryCount">—</strong>Categories</div>
 
-    <div class="stat"><strong>0</strong>Live Listings</div>
+    <div class="stat"><strong id="liveListingCount">—</strong>Live Listings</div>
 
     <div class="stat"><strong>0</strong>Matches</div>
 
@@ -381,15 +385,8 @@ if (categoryNames[index] === "sports") return;
 
   <h2>Latest Listings</h2>
 
-  <div class="grid">
-
-    <div class="listing"><span class="badge">Wanted</span><h3>Single AirPod Pro</h3><p>Looking for right side AirPod Pro, white.</p></div>
-
-    <div class="listing"><span class="badge">Available</span><h3>One black glove</h3><p>Found one black leather glove in good condition.</p></div>
-
-    <div class="listing"><span class="badge">Missing</span><h3>Board game card</h3><p>Need one missing card to complete the set.</p></div>
-
-  </div>
+  <p id="latestListingsStatus" role="status">Loading listings…</p>
+  <div class="grid" id="latestListingsGrid"></div>
 
 </section>
 
@@ -452,7 +449,68 @@ if (categoryNames[index] === "sports") return;
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script defer src="auth.js"></script>
+<script defer src="listings-data.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const liveCount = document.getElementById('liveListingCount');
+  const status = document.getElementById('latestListingsStatus');
+  const grid = document.getElementById('latestListingsGrid');
+
+  try {
+    const client = OneOfTwoAuth.getClient();
+    const { fields, imageUrls, typeLabel } = OneOfTwoListings;
+    const { data, count, error } = await client.from('listings')
+      .select(fields, { count: 'exact' })
+      .eq('publication_status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (error) throw error;
+    if (!Number.isInteger(count)) throw new Error('Published listing count is unavailable.');
+
+    liveCount.textContent = count;
+    if (!data.length) {
+      status.textContent = 'No published listings yet.';
+      return;
+    }
+
+    const cards = data.map(item => {
+      const card = document.createElement('a');
+      card.className = 'listing';
+      card.href = 'listing.html?id=' + encodeURIComponent(item.id);
+
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = typeLabel(item.listing_type);
+      const title = document.createElement('h3');
+      title.textContent = item.title || 'Untitled listing';
+      const description = document.createElement('p');
+      description.textContent = item.description || '';
+      card.append(badge, title, description);
+      return card;
+    });
+
+    grid.replaceChildren(...cards);
+    status.hidden = true;
+
+    const urls = await imageUrls(client, data).catch(() => new Map());
+    data.forEach((item, index) => {
+      const url = urls.get(item.id);
+      if (!url) return;
+
+      const image = document.createElement('img');
+      image.alt = '';
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+      image.addEventListener('error', () => image.remove(), { once: true });
+      image.src = url;
+      cards[index].append(image);
+    });
+  } catch {
+    status.textContent = 'Unable to load listings. Please try again.';
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginEmail = document.getElementById('loginEmail');
   const signupEmail = document.getElementById('signupEmail');
