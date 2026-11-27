@@ -72,6 +72,12 @@ nav a:hover{color:white}
 
 .card li{margin:8px 0;color:#e2e8f0}
 
+.sports-card{position:relative;isolation:isolate}
+.sports-card a{color:inherit;text-decoration:none}
+.sports-card-link::after{content:"";position:absolute;inset:0;z-index:1;border-radius:18px}
+.sports-card li a{position:relative;z-index:2}
+.sports-card a:focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+
 .listing{background:#020617;border:1px solid #1e293b;border-radius:18px;padding:22px}
 
 #latestListingsGrid .listing{color:inherit;text-decoration:none;overflow-wrap:anywhere}
@@ -247,9 +253,9 @@ nav a{display:inline-block;margin:8px 10px}
 
       
 
-<div class="card">
+<div class="card sports-card">
 
-  <h3>🏅 Sports &amp; Outdoors</h3>
+  <h3><a class="sports-card-link" href="listings.html?category=sports">🏅 Sports &amp; Outdoors</a></h3>
 
   <ul>
 
@@ -341,7 +347,7 @@ nav a{display:inline-block;margin:8px 10px}
 
     
 
-if (categoryNames[index] === "sports") return;
+    if (card.classList.contains('sports-card')) return;
 
     const link = document.createElement("a");
 
