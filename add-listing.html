@@ -10,7 +10,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Add a Listing | OneOfTwo</title>
+  <title data-i18n="editor.pageTitle">Add a Listing | OneOfTwo</title>
+  <script src="i18n.js"></script>
+  <script src="i18n-listing.js"></script>
+  <link rel="stylesheet" href="i18n.css">
  
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -274,7 +277,8 @@ select {
     }
 
     #preview img[hidden] { display: none; }
-    #previewDescription { white-space: pre-wrap; overflow-wrap: anywhere; }
+    #previewTitle, #previewDescription { overflow-wrap: anywhere; }
+    #previewDescription { white-space: pre-wrap; }
     button:disabled { opacity: 0.55; cursor: default; }
 
     .note {
@@ -311,13 +315,14 @@ select {
 
 </head>
 
-<body>
+<body class="add-listing-page">
 
   <header>
 
+    <div data-language-switcher></div>
     <h1>OneOfTwo</h1>
 
-    <p>Find the missing half</p>
+    <p data-i18n="editor.tagline">Find the missing half</p>
 
   </header>
 
@@ -325,17 +330,17 @@ select {
 
     <section class="panel">
 
-      <h2>Add a listing</h2>
+      <h2 data-i18n="editor.heading">Add a listing</h2>
 
-      <p>Every missing half deserves a chance.</p>
+      <p data-i18n="editor.intro">Every missing half deserves a chance.</p>
       
 
-<p id="authStatus" class="note" role="status">Checking sign-in status…</p>
-      <p id="signInLink" hidden><a href="index.html#login">Log in to save or publish</a></p>
+      <p id="authStatus" class="note" role="status" data-i18n="editor.checkingAuth">Checking sign-in status…</p>
+      <p id="signInLink" hidden><a href="index.html#login" data-i18n="editor.loginLink">Log in to save or publish</a></p>
 
       <form id="listingForm">
 
-        <p><strong>What would you like to do?</strong></p>
+        <p><strong data-i18n="editor.chooseType">What would you like to do?</strong></p>
 
         <div class="choices">
 
@@ -345,7 +350,7 @@ select {
 
                    value="available" checked>
 
-            <span>📦 I HAVE</span>
+            <span>📦 <b data-i18n="listing.type.available">I HAVE</b></span>
 
           </label>
 
@@ -355,7 +360,7 @@ select {
 
                    value="wanted">
 
-            <span>🔎 I'M LOOKING FOR</span>
+            <span>🔎 <b data-i18n="listing.type.wanted">I'M LOOKING FOR</b></span>
 
           </label>
 
@@ -363,11 +368,11 @@ select {
 
         <label class="field">
 
-          Item name
+          <span data-i18n="editor.itemName">Item name</span>
 
           <input type="text" id="itemTitle"
 
-                 placeholder="e.g. Nike Air Max 90"
+                 placeholder="e.g. Nike Air Max 90" data-i18n-placeholder="editor.itemPlaceholder"
 
                  maxlength="120" required>
 
@@ -376,32 +381,32 @@ select {
 
 <label class="field">
 
-  Category
+  <span data-i18n="editor.category">Category</span>
 
   <select id="itemCategory" required>
 
-    <option value="" selected disabled>Select category</option>
+    <option value="" selected disabled data-i18n="editor.selectCategory">Select category</option>
 
-    <option value="fashion">Fashion & Shoes</option>
+    <option value="fashion" data-i18n="category.fashion">Fashion &amp; Shoes</option>
 
-    <option value="jewellery">Jewellery & Watches</option>
+    <option value="jewellery" data-i18n="category.jewellery">Jewellery &amp; Watches</option>
 
-    <option value="home">Home & Living</option>
+    <option value="home" data-i18n="category.home">Home &amp; Living</option>
 
-    <option value="automotive">Automotive</option> 
-    <option value="sports">Sports &amp; Outdoors</option>
+    <option value="automotive" data-i18n="category.automotive">Automotive</option>
+    <option value="sports" data-i18n="category.sports">Sports &amp; Outdoors</option>
 
-    <option value="electronics">Electronics</option>
+    <option value="electronics" data-i18n="category.electronics">Electronics</option>
 
-    <option value="tools">Tools & Hardware</option>
+    <option value="tools" data-i18n="category.tools">Tools &amp; Hardware</option>
 
-    <option value="toys">Toys & Games</option>
+    <option value="toys" data-i18n="category.toys">Toys &amp; Games</option>
 
-    <option value="collectibles">Collectibles & Sets</option>
+    <option value="collectibles" data-i18n="category.collectibles">Collectibles &amp; Sets</option>
 
-    <option value="lost">Lost & Found</option>
+    <option value="lost" data-i18n="category.lost">Lost &amp; Found</option>
 
-    <option value="parts">Missing Parts</option>
+    <option value="parts" data-i18n="category.parts">Missing Parts</option>
 
   </select>
 
@@ -409,32 +414,33 @@ select {
 
         <label class="field">
 
-          Description
+          <span data-i18n="editor.description">Description</span>
 
           <textarea id="itemDescription"
 
-                    placeholder="Describe your item or the missing half..."></textarea>
+                    placeholder="Describe your item or the missing half..."
+                    data-i18n-placeholder="editor.descriptionPlaceholder"></textarea>
 
         </label> 
         
 
         <div class="photo-field">
-          <label class="field" id="photoFieldLabel" for="itemImage">Add photo (optional)</label>
+          <label class="field" id="photoFieldLabel" for="itemImage" data-i18n="editor.addPhoto">Add photo (optional)</label>
           <div class="photo-picker">
             <input type="file" id="itemImage" class="photo-picker-input"
                    accept="image/jpeg,image/png,image/webp"
                    aria-labelledby="photoPickerLabel" aria-describedby="photoFieldLabel photoFileName">
-            <label id="photoPickerLabel" class="photo-picker-button" for="itemImage"><span>Choose photo</span></label>
-            <span class="photo-file-name" id="photoFileName" role="status">No photo selected</span>
+            <label id="photoPickerLabel" class="photo-picker-button" for="itemImage"><span data-i18n="editor.choosePhoto">Choose photo</span></label>
+            <span class="photo-file-name" id="photoFileName" role="status" data-i18n="editor.noPhoto">No photo selected</span>
           </div>
         </div>
 
   
 
-        <button type="submit" id="previewListingButton">Preview listing</button>
+        <button type="submit" id="previewListingButton" data-i18n="editor.preview">Preview listing</button>
         
 
-<button type="button" id="saveDraftButton"
+<button type="button" id="saveDraftButton" data-i18n="editor.saveDraft"
 
         style="margin-top: 12px;" disabled>
 
@@ -442,7 +448,7 @@ select {
 
 </button>
 
-<button type="button" id="publishListingButton"
+<button type="button" id="publishListingButton" data-i18n="editor.publish"
 
         style="margin-top: 12px;" disabled>
 
@@ -452,12 +458,12 @@ select {
 
 <p id="listingStatus" class="note" role="status"></p>
         <p id="listingResult" hidden><a id="listingResultLink"></a></p>
-        <p id="newListingLink" hidden><a href="add-listing.html">Add another listing</a></p>
+        <p id="newListingLink" hidden><a href="add-listing.html" data-i18n="editor.addAnother">Add another listing</a></p>
       </form>
 
       <div id="preview" hidden>
 
-        <h3>Your listing preview</h3>
+        <h3 data-i18n="editor.previewHeading">Your listing preview</h3>
 
         <p id="previewType"></p>
         <p id="previewCategory"></p>
@@ -470,7 +476,7 @@ select {
 
     </section>
 
-    <a class="back" href="index.html">
+    <a class="back" href="index.html" data-i18n="editor.backHome">
 
       Back to OneOfTwo
 
@@ -484,7 +490,14 @@ select {
       const photoFileName = document.getElementById('photoFileName');
 
       function updatePhotoFileName() {
-        photoFileName.textContent = photoInput.files[0]?.name || 'No photo selected';
+        const name = photoInput.files[0]?.name;
+        if (name) {
+          delete photoFileName.dataset.i18n;
+          photoFileName.textContent = name;
+        } else {
+          photoFileName.dataset.i18n = 'editor.noPhoto';
+          window.OneOfTwoI18n.translate(photoFileName);
+        }
       }
 
       photoInput.addEventListener('change', updatePhotoFileName);

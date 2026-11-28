@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const i18n = window.OneOfTwoI18n;
   const form = document.getElementById('listingForm');
   const authStatus = document.getElementById('authStatus');
   const loginLink = document.getElementById('signInLink');
@@ -6,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const result = document.getElementById('listingResult');
   const resultLink = document.getElementById('listingResultLink');
   const preview = document.getElementById('preview');
+  const previewType = document.getElementById('previewType');
+  const previewCategory = document.getElementById('previewCategory');
   const previewButton = document.getElementById('previewListingButton');
   const previewPhoto = document.getElementById('previewPhoto');
   const draftButton = document.getElementById('saveDraftButton');
@@ -33,6 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let photoAttempt;
   const attemptedPhotos = new Set();
 
+  function setMessage(element, key) {
+    if (key) {
+      element.dataset.i18n = key;
+      i18n.translate(element);
+    } else {
+      delete element.dataset.i18n;
+      element.textContent = '';
+    }
+  }
+
   function updateControls() {
     editorFields.forEach(field => { field.disabled = loading || saving || published; });
     previewButton.disabled = loading || saving || published;
@@ -44,13 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form.reportValidity()) return null;
     const title = titleInput.value.trim();
     if (!title) {
-      status.textContent = 'Enter an item name.';
+      setMessage(status, 'editor.enterItemName');
       titleInput.focus();
       return null;
     }
     const photo = photoInput.files[0];
     if (photo && (!extensions.has(photo.type) || photo.size === 0 || photo.size > maxPhotoSize)) {
-      status.textContent = 'Choose a JPG, PNG or WebP file up to 10 MB.';
+      setMessage(status, 'editor.invalidPhoto');
       photoInput.focus();
       return null;
     }
@@ -63,10 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function showPreview(values) {
-    document.getElementById('previewType').textContent = values.listing_type === 'wanted'
-      ? "I'M LOOKING FOR" : 'I HAVE';
+    setMessage(previewType, `listing.type.${values.listing_type}`);
     document.getElementById('previewTitle').textContent = values.title;
-    document.getElementById('previewCategory').textContent = categoryInput.selectedOptions[0].textContent;
+    setMessage(previewCategory, `category.${values.category}`);
     document.getElementById('previewDescription').textContent = values.description;
     if (localPhotoUrl) URL.revokeObjectURL(localPhotoUrl);
     localPhotoUrl = photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : null;
@@ -102,9 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showPublished(row) {
     published = true;
-    status.textContent = 'Listing published.';
+    setMessage(status, 'editor.published');
     resultLink.href = 'listing.html?id=' + encodeURIComponent(row.id);
-    resultLink.textContent = 'View published listing';
+    setMessage(resultLink, 'editor.viewPublished');
     result.hidden = false;
     document.getElementById('newListingLink').hidden = false;
   }
@@ -116,14 +128,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data, error } = await client.auth.getUser();
       const user = data?.user;
       if (!user && (!error || error.name === 'AuthSessionMissingError')) {
-        authStatus.textContent = 'Log in to save or publish a listing.';
+        setMessage(authStatus, 'editor.loginToContinue');
         loginLink.hidden = false;
         return;
       }
       if (error) throw error;
 
       editorUserId = user.id;
-      authStatus.textContent = 'You are signed in.';
+      setMessage(authStatus, 'editor.signedIn');
       if (!requestId) requestId = crypto.randomUUID();
       try {
         const readiness = await client.rpc('oneoftwo_listing_writes_enabled');
@@ -133,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Unable to check listing write availability:', error);
       }
       if (!writesEnabled) {
-        status.textContent = 'Saving and publishing are temporarily paused. You can still preview changes.';
+        setMessage(status, 'editor.writesPaused');
       }
       if (!request) return;
       if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(requestId)) {
@@ -153,12 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('Unable to open listing editor:', error);
       editorUserId = null;
-      authStatus.textContent = request
-        ? 'Could not open this draft. Check your account or return to the dashboard.'
-        : 'Could not check sign-in status. Refresh the page to try again.';
+      setMessage(authStatus, request ? 'editor.draftOpenError' : 'editor.authCheckError');
       if (request) {
         resultLink.href = 'dashboard.html';
-        resultLink.textContent = 'Back to your drafts';
+        setMessage(resultLink, 'editor.backToDrafts');
         result.hidden = false;
       }
     } finally {
@@ -211,14 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function save(publicationStatus) {
     if (saving || published || !editorUserId || !writesEnabled) return;
-    status.textContent = '';
+    setMessage(status);
     const values = readForm();
     if (!values) return;
     const photo = photoInput.files[0];
     saving = true;
     updateControls();
     result.hidden = true;
-    status.textContent = 'Saving listing…';
+    setMessage(status, 'editor.saving');
     const client = OneOfTwoAuth.getClient();
     let operation = 'session';
 
@@ -271,21 +281,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (publicationStatus === 'published') {
         showPublished(savedRow);
       } else {
-        history.replaceState(null, '', 'add-listing.html?draft=' + encodeURIComponent(requestId));
-        status.textContent = 'Draft saved. You can publish it here or find it in your dashboard.';
+        history.replaceState(null, '', i18n.href('add-listing.html?draft=' + encodeURIComponent(requestId)));
+        setMessage(status, 'editor.draftSaved');
         resultLink.href = 'dashboard.html';
-        resultLink.textContent = 'View your drafts';
+        setMessage(resultLink, 'editor.viewDrafts');
         result.hidden = false;
       }
     } catch (error) {
       console.error('Listing operation failed:', operation, error);
-      const messages = {
-        session: 'Could not verify your session. Log in again before saving.',
-        read: 'Could not check the listing. Try again.',
-        photo: 'Could not upload the photo. Try again or choose a different file.',
-        save: 'Could not confirm the save. Try again before starting another listing.'
-      };
-      status.textContent = messages[operation];
+      setMessage(status, `editor.saveError.${operation}`);
     } finally {
       saving = false;
       updateControls();
@@ -295,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', event => {
     event.preventDefault();
     if (loading || saving || published) return;
-    status.textContent = '';
+    setMessage(status);
     const values = readForm();
     if (values) showPreview(values);
   });
@@ -307,5 +311,19 @@ document.addEventListener('DOMContentLoaded', () => {
     preview.hidden = true;
   });
   previewPhoto.addEventListener('error', () => { previewPhoto.hidden = true; });
+
+  for (const [field, key] of [[titleInput, 'editor.enterItemName'], [categoryInput, 'editor.categoryRequired']]) {
+    function updateValidationMessage() {
+      field.setCustomValidity(field.validity.valueMissing ? i18n.t(key) : '');
+    }
+
+    field.addEventListener('invalid', updateValidationMessage);
+    field.addEventListener('input', updateValidationMessage);
+    field.addEventListener('change', updateValidationMessage);
+    document.addEventListener('oneoftwo:languagechange', () => {
+      if (field.validity.customError) updateValidationMessage();
+    });
+  }
+
   initialize();
 });
