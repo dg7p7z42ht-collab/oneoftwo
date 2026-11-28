@@ -167,39 +167,61 @@ select {
 
 }
 
-input[type="file"] {
+    .photo-field { margin: 18px 0; }
+    .photo-field > .field { margin: 0; }
 
-  display: block;
+    .photo-picker {
+      display: flex;
+      align-items: center;
+      position: relative;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: .8125rem;
+      line-height: 1.35;
+    }
 
-  width: 100%;
+    .photo-picker-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
 
-  margin-top: 10px;
+    .photo-picker-button {
+      display: inline-flex;
+      align-items: center;
+      flex: none;
+      min-height: 44px;
+      cursor: pointer;
+    }
 
-  font-size: 18px;
+    .photo-picker-button span {
+      padding: 5px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #17243a;
+      font-weight: 600;
+    }
 
-  font-weight: normal;
+    .photo-picker-input:focus + .photo-picker-button span {
+      outline: 2px solid #168b77;
+      outline-offset: 2px;
+    }
 
-}
+    .photo-picker-input:disabled + .photo-picker-button {
+      cursor: not-allowed;
+      opacity: .6;
+    }
 
-input[type="file"]::file-selector-button {
-
-  font-size: 18px;
-
-  padding: 9px 14px;
-
-  margin-right: 12px;
-
-  border: 1px solid #cbd5e1;
-
-  border-radius: 9px;
-
-  background: #f1f5f9;
-
-  color: #17243a;
-
-  cursor: pointer;
-
-}
+    .photo-file-name {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      color: #475569;
+    }
 
     textarea {
 
@@ -396,15 +418,16 @@ input[type="file"]::file-selector-button {
         </label> 
         
 
-<label class="field">
-
-  Add photo (optional)
-
-  <input type="file" id="itemImage"
-
-         accept="image/jpeg,image/png,image/webp">
-
-</label>
+        <div class="photo-field">
+          <label class="field" id="photoFieldLabel" for="itemImage">Add photo (optional)</label>
+          <div class="photo-picker">
+            <input type="file" id="itemImage" class="photo-picker-input"
+                   accept="image/jpeg,image/png,image/webp"
+                   aria-labelledby="photoPickerLabel" aria-describedby="photoFieldLabel photoFileName">
+            <label id="photoPickerLabel" class="photo-picker-button" for="itemImage"><span>Choose photo</span></label>
+            <span class="photo-file-name" id="photoFileName" role="status">No photo selected</span>
+          </div>
+        </div>
 
   
 
@@ -454,6 +477,21 @@ input[type="file"]::file-selector-button {
     </a>
 
   </main>
+
+  <script>
+    (() => {
+      const photoInput = document.getElementById('itemImage');
+      const photoFileName = document.getElementById('photoFileName');
+
+      function updatePhotoFileName() {
+        photoFileName.textContent = photoInput.files[0]?.name || 'No photo selected';
+      }
+
+      photoInput.addEventListener('change', updatePhotoFileName);
+      photoInput.form.addEventListener('reset', () => setTimeout(updatePhotoFileName, 0));
+      window.addEventListener('pageshow', updatePhotoFileName);
+    })();
+  </script>
 
 </body>
 
