@@ -8,9 +8,12 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>OneOfTwo - Find the missing half</title>
+<title data-i18n="home.title">OneOfTwo - Find the missing half</title>
 
 <link rel="icon" type="image/png" href="Oneoftwo .png">
+<link rel="stylesheet" href="i18n.css">
+<script src="i18n.js"></script>
+<script src="i18n-home.js"></script>
 
 <style>
 
@@ -135,13 +138,13 @@ nav a{display:inline-block;margin:8px 10px}
 
 </head>
 
-<body>
+<body class="home-page">
 
 <header>
 
   <div class="logo">
 
-    <img src="Oneoftwo .png" alt="OneOfTwo Logo">
+    <img src="Oneoftwo .png" alt="OneOfTwo Logo" data-i18n-alt="home.logo">
 
     <span>OneOfTwo</span>
 
@@ -149,53 +152,55 @@ nav a{display:inline-block;margin:8px 10px}
 
   <nav>
 
-    <a href="#categories">Categories</a>
+    <a href="#categories" data-i18n="home.nav.categories">Categories</a>
 
-    <a href="#popular">Popular Searches</a>
+    <a href="#popular" data-i18n="home.nav.popular">Popular Searches</a>
 
-    <a href="#listings">Listings</a>
+    <a href="#listings" data-i18n="home.nav.listings">Listings</a>
 
     
 
-<a href="add-listing.html">Add Listing</a>
+<a href="add-listing.html" data-i18n="home.addListing">Add Listing</a>
 
-    <a href="#login">Login</a>
+    <a href="#login" data-i18n="home.auth.login">Login</a>
 
-    <a href="#signup">Sign Up</a>
+    <a href="#signup" data-i18n="home.auth.signup">Sign Up</a>
 
   </nav>
+
+  <div data-language-switcher></div>
 
 </header>
 
 <section class="hero">
 
-  <img src="Oneoftwo .png" alt="OneOfTwo Logo">
+  <img src="Oneoftwo .png" alt="OneOfTwo Logo" data-i18n-alt="home.logo">
 
   <h1>OneOfTwo</h1>
 
-  <h2>Find the missing half.</h2>
+  <h2 data-i18n="home.tagline">Find the missing half.</h2>
 
-  <p>Missing parts. Single items. Incomplete sets. Lost treasures. OneOfTwo helps people match, sell, exchange or recover what is incomplete.</p>
+  <p data-i18n="home.intro">Missing parts. Single items. Incomplete sets. Lost treasures. OneOfTwo helps people match, sell, exchange or recover what is incomplete.</p>
 
   <div class="search">
 
-    <input type="text" placeholder="Search for single earring, LEGO piece, one shoe, remote control, lost item...">
+    <input type="text" placeholder="Search for single earring, LEGO piece, one shoe, remote control, lost item..." data-i18n-placeholder="home.search.placeholder">
 
   </div>
 
-  <button class="btn primary">Search items</button>
+  <button class="btn primary" data-i18n="home.search.button">Search items</button>
 
   
 
-<button class="btn secondary" onclick="window.location.href='add-listing.html'">Add Listing</button>
+<button class="btn secondary" data-i18n="home.addListing" onclick="window.location.href=OneOfTwoI18n.href('add-listing.html')">Add Listing</button>
 
   <div class="stats">
 
-    <div class="stat"><strong id="categoryCount">—</strong>Categories</div>
+    <div class="stat"><strong id="categoryCount">—</strong><span data-i18n="home.nav.categories">Categories</span></div>
 
-    <div class="stat"><strong id="liveListingCount">—</strong>Live Listings</div>
+    <div class="stat"><strong id="liveListingCount">—</strong><span data-i18n="home.stats.live">Live Listings</span></div>
 
-    <div class="stat"><strong>0</strong>Matches</div>
+    <div class="stat"><strong>0</strong><span data-i18n="home.stats.matches">Matches</span></div>
 
   </div>
 
@@ -203,37 +208,37 @@ nav a{display:inline-block;margin:8px 10px}
 
 <section id="categories" class="section">
 
-  <h2>What are you looking for?</h2>
+  <h2 data-i18n="home.categories.question">What are you looking for?</h2>
 
   <div class="layout">
 
     <div class="sidebar">
 
-      <h3>All categories</h3>
+      <h3 data-i18n="home.categories.all">All categories</h3>
 
-      <a href="listings.html?category=fashion">Fashion & Shoes</a>
+      <a href="listings.html?category=fashion" data-i18n="category.fashion">Fashion & Shoes</a>
 
-      <a href="listings.html?category=jewellery">Jewellery & Watches</a>
+      <a href="listings.html?category=jewellery" data-i18n="category.jewellery">Jewellery & Watches</a>
 
-      <a href="listings.html?category=home">Home & Living</a>
+      <a href="listings.html?category=home" data-i18n="category.home">Home & Living</a>
 
-      <a href="listings.html?category=automotive">Automotive</a> 
+      <a href="listings.html?category=automotive" data-i18n="category.automotive">Automotive</a>
 
       
 
-<a href="listings.html?category=sports">Sports &amp; Outdoors</a>
+<a href="listings.html?category=sports" data-i18n="category.sports">Sports &amp; Outdoors</a>
 
-      <a href="listings.html?category=electronics">Electronics</a>
+      <a href="listings.html?category=electronics" data-i18n="category.electronics">Electronics</a>
 
-      <a href="listings.html?category=tools">Tools & Hardware</a>
+      <a href="listings.html?category=tools" data-i18n="category.tools">Tools & Hardware</a>
 
-      <a href="listings.html?category=toys">Toys & Games</a>
+      <a href="listings.html?category=toys" data-i18n="category.toys">Toys & Games</a>
 
-      <a href="listings.html?category=collectibles">Collectibles</a>
+      <a href="listings.html?category=collectibles" data-i18n="home.categories.collectiblesShort">Collectibles</a>
 
-      <a href="listings.html?category=lost">Lost & Found</a>
+      <a href="listings.html?category=lost" data-i18n="category.lost">Lost & Found</a>
 
-      <a href="listings.html?category=parts">Missing Parts</a>
+      <a href="listings.html?category=parts" data-i18n="category.parts">Missing Parts</a>
 
     </div>
 
@@ -242,66 +247,66 @@ nav a{display:inline-block;margin:8px 10px}
    <a href="listings.html?category=fashion" style="color:inherit;text-decoration:none;">
 
 
-      <div class="card"><h3>👟 Fashion & Shoes</h3><ul><li>Single shoes</li><li>Gloves</li><li>Socks</li><li>Belts</li><li>Handbag parts</li></ul></div>
+      <div class="card"><h3>👟 <span data-i18n="category.fashion">Fashion & Shoes</span></h3><ul><li data-i18n="home.fashion.shoes">Single shoes</li><li data-i18n="home.fashion.gloves">Gloves</li><li data-i18n="home.fashion.socks">Socks</li><li data-i18n="home.fashion.belts">Belts</li><li data-i18n="home.fashion.handbag">Handbag parts</li></ul></div>
      </a>
 
-      <div class="card"><h3>💍 Jewellery & Watches</h3><ul><li>Single earrings</li><li>Watch parts</li><li>Bracelet elements</li><li>Necklace parts</li><li>Charms</li></ul></div>
+      <div class="card"><h3>💍 <span data-i18n="category.jewellery">Jewellery & Watches</span></h3><ul><li data-i18n="home.jewellery.earrings">Single earrings</li><li data-i18n="home.jewellery.watch">Watch parts</li><li data-i18n="home.jewellery.bracelet">Bracelet elements</li><li>Necklace parts</li><li data-i18n="home.jewellery.charms">Charms</li></ul></div>
 
-      <div class="card"><h3>🏠 Home & Living</h3><ul><li>Decorative items</li><li>Cups and plates</li><li>Lampshades</li><li>Furniture parts</li><li>Home ornaments</li></ul></div>
+      <div class="card"><h3>🏠 <span data-i18n="category.home">Home & Living</span></h3><ul><li data-i18n="home.living.decorations">Decorative items</li><li data-i18n="home.living.cups">Cups and plates</li><li data-i18n="home.living.lampshades">Lampshades</li><li data-i18n="home.living.furniture">Furniture parts</li><li data-i18n="home.living.ornaments">Home ornaments</li></ul></div>
 
-      <div class="card"><h3>🚗 Automotive</h3><ul><li>Car parts</li><li>Mirror covers</li><li>Wheel caps</li><li>Interior parts</li><li>Bicycle parts</li></ul></div>
+      <div class="card"><h3>🚗 <span data-i18n="category.automotive">Automotive</span></h3><ul><li data-i18n="home.automotive.parts">Car parts</li><li data-i18n="home.automotive.mirrors">Mirror covers</li><li data-i18n="home.automotive.hubcaps">Wheel caps</li><li data-i18n="home.automotive.interior">Interior parts</li><li data-i18n="home.automotive.bicycle">Bicycle parts</li></ul></div>
 
       
 
 <div class="card sports-card">
 
-  <h3><a class="sports-card-link" href="listings.html?category=sports">🏅 Sports &amp; Outdoors</a></h3>
+  <h3><a class="sports-card-link" href="listings.html?category=sports">🏅 <span data-i18n="category.sports">Sports &amp; Outdoors</span></a></h3>
 
   <ul>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=cycling">Cycling &amp; Bike Parts</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=cycling" data-i18n="home.sport.cycling">Cycling &amp; Bike Parts</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=winter">Winter Sports</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=winter" data-i18n="home.sport.winter">Winter Sports</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=fitness">Fitness &amp; Training</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=fitness" data-i18n="home.sport.fitness">Fitness &amp; Training</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=water">Water Sports</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=water" data-i18n="home.sport.water">Water Sports</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=camping">Camping &amp; Hiking</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=camping" data-i18n="home.sport.camping">Camping &amp; Hiking</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=motorsports">Motorsports</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=motorsports" data-i18n="home.sport.motorsports">Motorsports</a></li>
 
     
 
-<li><a href="listings.html?category=sports&amp;subcategory=other">Other Sports</a></li>
+<li><a href="listings.html?category=sports&amp;subcategory=other" data-i18n="home.sport.other">Other Sports</a></li>
 
   </ul>
 
 </div>
       
-      <div class="card"><h3>🎧 Electronics</h3><ul><li>Single headphones</li><li>Chargers</li><li>Remote controls</li><li>Cables</li><li>Phone accessories</li></ul></div>
+      <div class="card"><h3>🎧 <span data-i18n="category.electronics">Electronics</span></h3><ul><li data-i18n="home.electronics.headphones">Single headphones</li><li data-i18n="home.electronics.chargers">Chargers</li><li data-i18n="home.electronics.remotes">Remote controls</li><li data-i18n="home.electronics.cables">Cables</li><li data-i18n="home.electronics.phones">Phone accessories</li></ul></div>
 
-      <div class="card"><h3>🧰 Tools & Hardware</h3><ul><li>Tool parts</li><li>Screws</li><li>Handles</li><li>Machine elements</li><li>Replacement parts</li></ul></div>
+      <div class="card"><h3>🧰 <span data-i18n="category.tools">Tools & Hardware</span></h3><ul><li data-i18n="home.tools.parts">Tool parts</li><li data-i18n="home.tools.screws">Screws</li><li data-i18n="home.tools.handles">Handles</li><li data-i18n="home.tools.machine">Machine elements</li><li data-i18n="home.tools.replacements">Replacement parts</li></ul></div>
 
-      <div class="card"><h3>🧸 Toys & Games</h3><ul><li>LEGO pieces</li><li>Puzzle pieces</li><li>Board game parts</li><li>Figures</li><li>Game accessories</li></ul></div>
+      <div class="card"><h3>🧸 <span data-i18n="category.toys">Toys & Games</span></h3><ul><li data-i18n="home.toys.lego">LEGO pieces</li><li data-i18n="home.toys.puzzles">Puzzle pieces</li><li data-i18n="home.toys.boardgame">Board game parts</li><li data-i18n="home.toys.figures">Figures</li><li data-i18n="home.toys.accessories">Game accessories</li></ul></div>
 
-      <div class="card"><h3>🃏 Collectibles & Sets</h3><ul><li>Trading cards</li><li>Coins</li><li>Model parts</li><li>Limited items</li><li>Incomplete collections</li></ul></div>
+      <div class="card"><h3>🃏 <span data-i18n="category.collectibles">Collectibles & Sets</span></h3><ul><li data-i18n="home.collectibles.cards">Trading cards</li><li data-i18n="home.collectibles.coins">Coins</li><li data-i18n="home.collectibles.models">Model parts</li><li data-i18n="home.collectibles.limited">Limited items</li><li data-i18n="home.collectibles.collections">Incomplete collections</li></ul></div>
 
-      <div class="card"><h3>🔍 Lost & Found</h3><ul><li>Lost items</li><li>Found items</li><li>Looking for owner</li><li>Recovered objects</li><li>Public place findings</li></ul></div>
+      <div class="card"><h3>🔍 <span data-i18n="category.lost">Lost & Found</span></h3><ul><li data-i18n="home.lost.items">Lost items</li><li>Found items</li><li data-i18n="home.lost.owner">Looking for owner</li><li data-i18n="home.lost.recovered">Recovered objects</li><li data-i18n="home.lost.public">Public place findings</li></ul></div>
 
-      <div class="card"><h3>🧩 Missing Parts</h3><ul><li>Single components</li><li>Set pieces</li><li>Pair matching</li><li>Replacement elements</li><li>One of two items</li></ul></div>
+      <div class="card"><h3>🧩 <span data-i18n="category.parts">Missing Parts</span></h3><ul><li data-i18n="home.parts.components">Single components</li><li data-i18n="home.parts.pieces">Set pieces</li><li data-i18n="home.parts.matching">Pair matching</li><li data-i18n="home.parts.replacements">Replacement elements</li><li data-i18n="home.parts.half">One of two items</li></ul></div>
 
     </div> 
     
@@ -371,17 +376,17 @@ nav a{display:inline-block;margin:8px 10px}
 
 <section id="popular" class="section">
 
-  <h2>Popular Searches</h2>
+  <h2 data-i18n="home.nav.popular">Popular Searches</h2>
 
   <div class="grid">
 
-    <div class="listing"><span class="badge">Fashion</span><h3>Single Nike shoe</h3><p>Looking for the matching left shoe.</p></div>
+    <div class="listing"><span class="badge" data-i18n="home.popular.badgeFashion">Fashion</span><h3 data-i18n="home.popular.shoe">Single Nike shoe</h3><p data-i18n="home.popular.shoeDescription">Looking for the matching left shoe.</p></div>
 
-    <div class="listing"><span class="badge">Jewellery</span><h3>One gold earring</h3><p>Missing second earring from a pair.</p></div>
+    <div class="listing"><span class="badge" data-i18n="home.popular.badgeJewellery">Jewellery</span><h3 data-i18n="home.popular.earring">One gold earring</h3><p data-i18n="home.popular.earringDescription">Missing second earring from a pair.</p></div>
 
-    <div class="listing"><span class="badge">Toys</span><h3>LEGO missing piece</h3><p>Small grey connector piece needed.</p></div>
+    <div class="listing"><span class="badge" data-i18n="home.popular.badgeToys">Toys</span><h3 data-i18n="home.popular.lego">LEGO missing piece</h3><p data-i18n="home.popular.legoDescription">Small grey connector piece needed.</p></div>
 
-    <div class="listing"><span class="badge">Automotive</span><h3>Wheel cap</h3><p>Looking for one matching wheel cap.</p></div>
+    <div class="listing"><span class="badge" data-i18n="category.automotive">Automotive</span><h3 data-i18n="home.popular.hubcap">Wheel cap</h3><p data-i18n="home.popular.hubcapDescription">Looking for one matching wheel cap.</p></div>
 
   </div>
 
@@ -389,67 +394,67 @@ nav a{display:inline-block;margin:8px 10px}
 
 <section id="listings" class="section">
 
-  <h2>Latest Listings</h2>
+  <h2 data-i18n="home.latest.heading">Latest Listings</h2>
 
-  <p id="latestListingsStatus" role="status">Loading listings…</p>
+  <p id="latestListingsStatus" role="status" data-i18n="home.latest.loading">Loading listings…</p>
   <div class="grid" id="latestListingsGrid"></div>
 
 </section>
 
 <section id="add" class="section">
-  <h2>Add your listing</h2>
-  <a class="btn primary" href="add-listing.html">Add Listing</a>
+  <h2 data-i18n="home.addHeading">Add your listing</h2>
+  <a class="btn primary" href="add-listing.html" data-i18n="home.addListing">Add Listing</a>
 </section>
 
 <section id="login" class="section">
-  <h2>Login or create account</h2>
+  <h2 data-i18n="home.auth.heading">Login or create account</h2>
   <div class="auth-grid">
     <div class="auth-card">
-      <h3>Login</h3>
+      <h3 data-i18n="home.auth.login">Login</h3>
       <form class="auth-form" id="loginForm" aria-describedby="loginStatus">
         <div class="auth-field">
-          <label for="loginEmail">Email address</label>
+          <label for="loginEmail" data-i18n="home.auth.email">Email address</label>
           <input id="loginEmail" type="email" autocomplete="username" required>
         </div>
         <div class="auth-field">
-          <label for="loginPassword">Password</label>
+          <label for="loginPassword" data-i18n="home.auth.password">Password</label>
           <div class="auth-password">
             <input id="loginPassword" type="password" autocomplete="current-password" required>
-            <button type="button" class="btn secondary" data-password="loginPassword">Show password</button>
+            <button type="button" class="btn secondary" data-password="loginPassword" data-i18n="home.auth.showPassword">Show password</button>
           </div>
         </div>
-        <button class="btn primary" type="submit">Login</button>
+        <button class="btn primary" type="submit" data-i18n="home.auth.login">Login</button>
         <p id="loginStatus" role="status"></p>
-        <p id="loginResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
+        <p id="loginResendLink" hidden><a href="auth-confirm.html#resend" data-i18n="home.auth.resend">Resend confirmation email</a></p>
       </form>
     </div>
     <div class="auth-card" id="signup">
-      <h3>Create account</h3>
+      <h3 data-i18n="home.auth.create">Create account</h3>
       <form class="auth-form" id="signupForm" aria-describedby="signupStatus">
         <div class="auth-field">
-          <label for="signupName">Full name</label>
+          <label for="signupName" data-i18n="home.auth.name">Full name</label>
           <input id="signupName" type="text" autocomplete="name" required>
         </div>
         <div class="auth-field">
-          <label for="signupEmail">Email address</label>
+          <label for="signupEmail" data-i18n="home.auth.email">Email address</label>
           <input id="signupEmail" type="email" autocomplete="username" required>
         </div>
         <div class="auth-field">
-          <label for="signupPassword">Password</label>
+          <label for="signupPassword" data-i18n="home.auth.password">Password</label>
           <div class="auth-password">
             <input id="signupPassword" type="password" autocomplete="new-password" required>
-            <button type="button" class="btn secondary" data-password="signupPassword">Show password</button>
+            <button type="button" class="btn secondary" data-password="signupPassword" data-i18n="home.auth.showPassword">Show password</button>
           </div>
         </div>
-        <button class="btn secondary" type="submit">Create account</button>
+        <button class="btn secondary" type="submit" data-i18n="home.auth.create">Create account</button>
         <p id="signupStatus" role="status"></p>
-        <p id="signupResendLink" hidden><a href="auth-confirm.html#resend">Resend confirmation email</a></p>
+        <p id="signupResendLink" hidden><a href="auth-confirm.html#resend" data-i18n="home.auth.resend">Resend confirmation email</a></p>
       </form>
     </div>
   </div>
 </section>
 
-<footer>
+<footer data-i18n="home.footer">
  © 2026 OneOfTwo — Find the missing half.
 </footer> 
 
@@ -457,6 +462,12 @@ nav a{display:inline-block;margin:8px 10px}
 <script defer src="auth.js"></script>
 <script defer src="listings-data.js"></script>
 <script>
+function setHomeText(element, key) {
+  if (key) element.dataset.i18n = key;
+  else delete element.dataset.i18n;
+  element.textContent = key ? OneOfTwoI18n.t(key) : '';
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const liveCount = document.getElementById('liveListingCount');
   const status = document.getElementById('latestListingsStatus');
@@ -464,7 +475,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const client = OneOfTwoAuth.getClient();
-    const { fields, imageUrls, typeLabel } = OneOfTwoListings;
+    const { fields, imageUrls } = OneOfTwoListings;
     const { data, count, error } = await client.from('listings')
       .select(fields, { count: 'exact' })
       .eq('publication_status', 'published')
@@ -476,7 +487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     liveCount.textContent = count;
     if (!data.length) {
-      status.textContent = 'No published listings yet.';
+      setHomeText(status, 'home.latest.empty');
       return;
     }
 
@@ -487,9 +498,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const badge = document.createElement('span');
       badge.className = 'badge';
-      badge.textContent = typeLabel(item.listing_type);
+      setHomeText(badge, item.listing_type === 'wanted' ? 'home.latest.wanted' : 'home.latest.available');
       const title = document.createElement('h3');
-      title.textContent = item.title || 'Untitled listing';
+      if (item.title) title.textContent = item.title;
+      else setHomeText(title, 'home.latest.untitled');
       const description = document.createElement('p');
       description.textContent = item.description || '';
       card.append(badge, title, description);
@@ -513,7 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       cards[index].append(image);
     });
   } catch {
-    status.textContent = 'Unable to load listings. Please try again.';
+    setHomeText(status, 'home.latest.error');
   }
 });
 
@@ -522,20 +534,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupEmail = document.getElementById('signupEmail');
   const signupName = document.getElementById('signupName');
 
-  const logoutNotice = new URLSearchParams(window.location.search).get('auth_notice');
-  if (logoutNotice === 'signed_out_locally') {
-    document.getElementById('loginStatus').textContent =
-      'Signed out of this browser. The server did not confirm sign-out.';
-    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+  const address = new URL(window.location.href);
+  if (address.searchParams.get('auth_notice') === 'signed_out_locally') {
+    setHomeText(document.getElementById('loginStatus'), 'home.auth.signedOutLocally');
+    address.searchParams.delete('auth_notice');
+    window.history.replaceState(null, '', address.pathname + address.search + address.hash);
   }
+
+  const authInputs = document.querySelectorAll('.auth-form input');
+
+  function translateInvalidField(input) {
+    input.setCustomValidity('');
+    if (input.validity.valueMissing) {
+      input.setCustomValidity(OneOfTwoI18n.t('home.auth.fieldRequired'));
+    } else if (input.validity.typeMismatch) {
+      input.setCustomValidity(OneOfTwoI18n.t('home.auth.invalidEmail'));
+    }
+  }
+
+  authInputs.forEach(input => {
+    input.addEventListener('invalid', () => translateInvalidField(input));
+    const clearValidation = () => input.setCustomValidity('');
+    input.addEventListener('input', clearValidation);
+    input.addEventListener('change', clearValidation);
+  });
+  document.addEventListener('oneoftwo:languagechange', () => {
+    authInputs.forEach(input => {
+      if (input.validity.customError) translateInvalidField(input);
+    });
+  });
 
   document.querySelectorAll('[data-password]').forEach(button => {
     button.addEventListener('click', () => {
       const input = document.getElementById(button.dataset.password);
       input.type = input.type === 'password' ? 'text' : 'password';
-      button.textContent = input.type === 'password' ? 'Show password' : 'Hide password';
+      setHomeText(button, input.type === 'password' ? 'home.auth.showPassword' : 'home.auth.hidePassword');
     });
   });
+
+  // Translate the existing auth helper's messages without changing its error handling.
+  const authMessageKeys = new Map([
+    ['Email or password is incorrect.', 'home.auth.invalidCredentials'],
+    ['Confirm your email before signing in.', 'home.auth.emailNotConfirmed'],
+    ['Choose a stronger password that meets the password requirements.', 'home.auth.weakPassword'],
+    ['Too many attempts. Please try again later.', 'home.auth.tooManyAttempts'],
+    ['Unable to connect. Check your connection and try again.', 'home.auth.connectionFailed']
+  ]);
 
   function handleSubmit(formId, statusId, resendId, pending, fallback, submit) {
     const form = document.getElementById(formId);
@@ -549,11 +593,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       resendLink.hidden = true;
       button.disabled = true;
-      status.textContent = pending;
+      setHomeText(status, pending);
       try {
-        status.textContent = await submit(resendLink) ?? '';
+        setHomeText(status, await submit(resendLink));
       } catch (error) {
-        status.textContent = OneOfTwoAuth.errorMessage(error, fallback);
+        const knownMessage = OneOfTwoAuth.errorMessage(error, '');
+        setHomeText(status, authMessageKeys.get(knownMessage) ?? fallback);
       } finally {
         button.disabled = false;
       }
@@ -561,9 +606,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   handleSubmit('signupForm', 'signupStatus', 'signupResendLink',
-    'Creating your account…', 'Unable to sign up. Please try again.', async resendLink => {
+    'home.auth.creating', 'home.auth.signupFailed', async resendLink => {
       const name = signupName.value.trim();
-      if (!name) return 'Enter your full name.';
+      if (!name) return 'home.auth.nameRequired';
 
       const { data, error } = await OneOfTwoAuth.getClient().auth.signUp({
         email: signupEmail.value.trim(),
@@ -583,11 +628,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       resendLink.hidden = false;
-      return 'If this address can be registered, you’ll receive a confirmation link. Check your inbox and spam folder.';
+      return 'home.auth.confirmationNotice';
     });
 
   handleSubmit('loginForm', 'loginStatus', 'loginResendLink',
-    'Signing in…', 'Unable to sign in. Please try again.', async resendLink => {
+    'home.auth.signingIn', 'home.auth.loginFailed', async resendLink => {
       const { data, error } = await OneOfTwoAuth.getClient().auth.signInWithPassword({
         email: loginEmail.value.trim(),
         password: document.getElementById('loginPassword').value
@@ -596,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resendLink.hidden = error.code !== 'email_not_confirmed';
         throw error;
       }
-      if (!data?.session) return 'Sign-in did not start a session. Please try again.';
+      if (!data?.session) return 'home.auth.noSession';
 
       window.location.assign('dashboard.html');
     });
